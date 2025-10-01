@@ -29,18 +29,51 @@ class CustomAppBar extends StatelessWidget
                 ValueListenableBuilder<UserModel?>(
                   valueListenable: currentUserNotifier,
                   builder: (context, user, child) {
+                    if (user == null) {
+                      // Show default avatar & "Guest" while loading
+                      return Row(
+                        children: [
+                          const CircleAvatar(
+                            radius: 35,
+                            backgroundImage: AssetImage(
+                              'assets/images/default_profile.png',
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            mainAxisAlignment:
+                                MainAxisAlignment.center,
+                            children: const [
+                              Text(
+                                'Guest',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight:
+                                      FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                'Let’s make today productive',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    }
+
+                    // Display actual user info
                     final image =
-                        (user != null &&
-                            user.profileImageUrl.isNotEmpty)
+                        (user.profileImageUrl.isNotEmpty)
                         ? NetworkImage(user.profileImageUrl)
                         : const AssetImage(
                                 'assets/images/user.png',
                               )
                               as ImageProvider;
-
-                    final name = user?.name ?? 'Guest';
-                    //extract first name 
-                    final firstName = (user?.name ?? 'Guest').split(' ').first;
 
                     return Row(
                       children: [
@@ -50,13 +83,13 @@ class CustomAppBar extends StatelessWidget
                         ),
                         const SizedBox(width: 10),
                         Column(
-                          mainAxisAlignment:
-                              MainAxisAlignment.center,
                           crossAxisAlignment:
                               CrossAxisAlignment.start,
+                          mainAxisAlignment:
+                              MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Hello, $firstName!',
+                              'Hello, ${user.name.split(' ').first}!',
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -74,6 +107,7 @@ class CustomAppBar extends StatelessWidget
                     );
                   },
                 ),
+
                 const Spacer(),
                 Builder(
                   builder: (context) {
