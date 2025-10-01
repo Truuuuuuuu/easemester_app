@@ -5,8 +5,7 @@ class CloudinaryService {
   final String cloudName = 'truuuu';
   final String uploadPreset = 'unsigned_upload';
 
-  /// Uploads an image to Cloudinary and returns the secure URL
-  Future<String?> uploadImage(File file) async {
+  Future<String?> uploadFile(File file) async {
     try {
       final dio = Dio();
       final formData = FormData.fromMap({
@@ -15,7 +14,7 @@ class CloudinaryService {
       });
 
       final response = await dio.post(
-        'https://api.cloudinary.com/v1_1/$cloudName/image/upload',
+        'https://api.cloudinary.com/v1_1/$cloudName/auto/upload',
         data: formData,
       );
 

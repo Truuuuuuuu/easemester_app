@@ -70,7 +70,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     setState(() => isUploadingPhoto = true);
 
     final uploadedUrl = await CloudinaryService()
-        .uploadImage(file);
+        .uploadFile(file);
 
     setState(() {
       isUploadingPhoto = false;

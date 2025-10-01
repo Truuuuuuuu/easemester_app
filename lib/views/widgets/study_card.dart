@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:easemester_app/models/study_card_model.dart';
+import 'package:easemester_app/models/file_card_model.dart';
 
 class StudyCard extends StatelessWidget {
-  final StudyCardModel card;
+  final FileCardModel file;
   final VoidCallback onTap;
 
   const StudyCard({
     super.key,
-    required this.card,
+    required this.file,
     required this.onTap,
   });
 
@@ -24,16 +24,35 @@ class StudyCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Image placeholder
             Expanded(
-              child: Image.asset(
-                card.imageUrl,
-                fit: BoxFit.cover,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  color: Colors.grey[300],
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  child: Image.asset(
+                    'assets/images/book1.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
             ),
+
+            // File name
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                card.description,
+                file.fileName, // show filename
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,

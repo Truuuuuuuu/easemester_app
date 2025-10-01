@@ -1,19 +1,17 @@
-import 'package:easemester_app/routes/navigation_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:easemester_app/controllers/home_controller.dart';
 import 'package:easemester_app/controllers/notes_controller.dart';
 import 'package:easemester_app/controllers/checklist_controller.dart';
-import 'package:easemester_app/models/study_card_model.dart';
 import 'package:easemester_app/views/pages/notes%20page/notes_page.dart';
 import 'package:easemester_app/views/pages/checklist_page.dart';
 import 'package:easemester_app/data/notifiers.dart';
 import 'package:easemester_app/data/constant.dart';
+import 'package:easemester_app/routes/navigation_helper.dart';
 
 class CustomFAB extends StatelessWidget {
   final HomeController homeController;
   final NotesController notesController;
   final ChecklistController checklistController;
-
   final GlobalKey<NotesPageState>? notesPageKey;
   final GlobalKey<ChecklistPageState>? checklistPageKey;
 
@@ -32,26 +30,25 @@ class CustomFAB extends StatelessWidget {
       valueListenable: selectedPageNotifier,
       builder: (context, selectedPage, _) {
         if (selectedPage == 0) {
-          return _buildFab(() {
-            final tabController =
-                homeController.tabController;
-            if (tabController.index == 0) {
-              homeController.addStudyHubCard(
-                StudyCardModel(
-                  imageUrl: 'assets/images/book1.png',
-                  description: 'New Study Hub Card',
-                ),
+          // HomePage FAB
+          return _buildFab(() async {
+            final tabIndex =
+                homeController.tabController.index;
+
+            if (tabIndex == 0) {
+              // Study Hub tab → add file to Study Hub subcollection
+              await homeController.pickAndUploadFile(
+                isStudyHub: true,
               );
-            } else if (tabController.index == 1) {
-              homeController.addFileCard(
-                StudyCardModel(
-                  imageUrl: 'assets/images/book2.png',
-                  description: 'New File Card',
-                ),
+            } else if (tabIndex == 1) {
+              // Files tab → add file to Files tab subcollection
+              await homeController.pickAndUploadFile(
+                isStudyHub: false,
               );
             }
           });
         } else if (selectedPage == 1) {
+          // NotesPage FAB
           return _buildFab(() {
             NavigationHelper.goToAddNote(
               context,
@@ -59,6 +56,7 @@ class CustomFAB extends StatelessWidget {
             );
           });
         } else if (selectedPage == 2) {
+          // ChecklistPage FAB
           return _buildFab(() {
             checklistPageKey?.currentState
                 ?.addChecklistCardDialog();
