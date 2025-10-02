@@ -26,18 +26,19 @@ class HomePage extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment:
                         MainAxisAlignment.spaceAround,
-                    children: const [
+                    children: [
                       AchievementItem(
                         title: "Files Uploaded",
-                        count: "0",
+                        isFiles: true,
                       ),
                       AchievementItem(
                         title: "Quizzes Completed",
-                        count: "0",
+                        // add later
                       ),
                       AchievementItem(
                         title: "Pending Tasks",
-                        count: "0",
+                        isPending:
+                            true, 
                       ),
                     ],
                   ),
@@ -70,9 +71,8 @@ class HomePage extends StatelessWidget {
                   // Study Hub tab (files with AI features)
                   GridView.builder(
                     padding: const EdgeInsets.all(16),
-                    itemCount: controller
-                        .studyHubCards
-                        .length, 
+                    itemCount:
+                        controller.studyHubCards.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,

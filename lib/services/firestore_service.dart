@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easemester_app/models/profile_model.dart';
+import 'package:rxdart/rxdart.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -22,7 +23,10 @@ class FirestoreService {
 
   // Save user data after signup
   Future<void> saveUser(UserModel user) async {
-    await _db.collection("users").doc(user.uid).set(user.toMap());
+    await _db
+        .collection("users")
+        .doc(user.uid)
+        .set(user.toMap());
   }
 
   // Get user data
@@ -85,5 +89,29 @@ class FirestoreService {
     return userNotesRef(
       uid,
     ).orderBy('createdAt', descending: true).snapshots();
+  }
+
+  //<<COUNT TOTAL FILES>>
+  Stream<int> totalFilesCountStream(String uid) {
+    final filesStream = _db
+        .collection("users")
+        .doc(uid)
+        .collection("files")
+        .snapshots()
+        .map((snap) => snap.size);
+
+    final studyHubStream = _db
+        .collection("users")
+        .doc(uid)
+        .collection("studyHubFiles")
+        .snapshots()
+        .map((snap) => snap.size);
+
+    return Rx.combineLatest2<int, int, int>(
+      filesStream,
+      studyHubStream,
+      (filesCount, studyHubCount) =>
+          filesCount + studyHubCount,
+    );
   }
 }

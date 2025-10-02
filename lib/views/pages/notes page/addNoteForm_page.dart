@@ -121,22 +121,12 @@ class _AddNoteFormPageState extends State<AddNoteFormPage> {
                     backgroundColor:
                         theme.colorScheme.primary,
                   ),
-                  icon: Icon(
-                    Icons.save,
-                    size: 22,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onPrimary,
-                  ),
-                  label: Text(
-                    "Save Note",
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelLarge
-                        ?.copyWith(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  label: const Text(
+                    "Save Note", style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),

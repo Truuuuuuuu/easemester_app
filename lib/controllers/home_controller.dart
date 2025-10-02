@@ -22,6 +22,9 @@ class HomeController extends ChangeNotifier {
   HomeController({required this.tabController}) {
     fetchFilesFromFirestore();
   }
+  
+  // Total files counter
+  int get totalFilesCount => studyHubCards.length + filesCards.length;
 
   Future<void> fetchFilesFromFirestore() async {
     final uid = FirebaseAuth.instance.currentUser!.uid;

@@ -78,4 +78,8 @@ class ChecklistController extends ChangeNotifier {
     }
     clearSelection();
   }
+
+  // Pending tasks counter
+  int get pendingCount => _items.where((item) => !item.completed).length;
+
 }
