@@ -21,11 +21,8 @@ class FirestoreService {
   }
 
   // Save user data after signup
-  Future<void> saveUser(
-    String uid,
-    Map<String, dynamic> data,
-  ) async {
-    await _db.collection("users").doc(uid).set(data);
+  Future<void> saveUser(UserModel user) async {
+    await _db.collection("users").doc(user.uid).set(user.toMap());
   }
 
   // Get user data

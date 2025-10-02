@@ -1,3 +1,6 @@
+import 'package:easemester_app/data/notifiers.dart';
+import 'package:easemester_app/models/profile_model.dart';
+import 'package:easemester_app/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../controllers/auth_controller.dart';
@@ -47,7 +50,9 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
     // Enforce strong password: min 6 characters, at least 1 uppercase, 1 number
-    if (!RegExp(r'^(?=.*[A-Z])(?=.*\d).{6,}$',).hasMatch(password)) {
+    if (!RegExp(
+      r'^(?=.*[A-Z])(?=.*\d).{6,}$',
+    ).hasMatch(password)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -68,6 +73,20 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       if (user != null && mounted) {
+        // Build a UserModel right after registration
+        final newUser = UserModel(
+          uid: user.uid,
+          name: name,
+          email: email,
+          profileImageUrl: '', // empty by default
+        );
+
+        // Save to Firestore
+        await FirestoreService().saveUser(newUser);
+
+        //  Update notifier immediately so AppBar shows correct data
+        currentUserNotifier.value = newUser;
+
         Navigator.pushReplacementNamed(context, '/home');
       }
     } on FirebaseAuthException catch (e) {

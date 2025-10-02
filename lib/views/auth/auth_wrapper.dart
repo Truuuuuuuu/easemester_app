@@ -23,12 +23,41 @@ class AuthWrapper extends StatelessWidget {
         }
 
         if (snapshot.hasData) {
-          // User is logged in → fetch user data from Firestore
-          FirestoreService().getCurrentUser().then((user) {
-            currentUserNotifier.value = user;
-          });
+          return FutureBuilder(
+            future: FirestoreService().getCurrentUser(),
+            builder: (context, userSnapshot) {
+              if (userSnapshot.connectionState ==
+                  ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
 
-          return const WidgetTree();
+              if (userSnapshot.hasError) {
+                return Scaffold(
+                  body: Center(
+                    child: Text(
+                      "Error: ${userSnapshot.error}",
+                    ),
+                  ),
+                );
+              }
+
+              if (userSnapshot.hasData) {
+                // Update notifier only if different
+                if (currentUserNotifier.value?.uid !=
+                    userSnapshot.data?.uid) {
+                  currentUserNotifier.value =
+                      userSnapshot.data;
+                }
+                return const WidgetTree();
+              }
+
+              return const LoginPage();
+            },
+          );
         }
 
         // Not logged in → go to login page

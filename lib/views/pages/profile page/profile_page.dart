@@ -1,3 +1,4 @@
+import 'package:easemester_app/data/notifiers.dart';
 import 'package:easemester_app/helpers/dialog_helpers.dart';
 import 'package:easemester_app/models/profile_model.dart';
 import 'package:easemester_app/services/firestore_service.dart';
@@ -69,6 +70,9 @@ class _ProfilePageState extends State<ProfilePage> {
     final confirm = await confirmSignOut(context);
     if (confirm == true) {
       await _auth.signOut();
+
+      currentUserNotifier.value = null;
+      
       if (mounted) {
         NavigationHelper.goToLogin(context);
       }

@@ -71,7 +71,7 @@ class CustomAppBar extends StatelessWidget
                         (user.profileImageUrl.isNotEmpty)
                         ? NetworkImage(user.profileImageUrl)
                         : const AssetImage(
-                                'assets/images/user.png',
+                                'assets/images/default_profile.png',
                               )
                               as ImageProvider;
 
