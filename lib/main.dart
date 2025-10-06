@@ -15,10 +15,12 @@ import 'package:flutter/material.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 👇 Initialize Firebase
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  //theme
+  await initTheme();
 
   runApp(const MyApp());
 }
@@ -36,7 +38,7 @@ class MyApp extends StatelessWidget {
           routes: {
             // CORE ROUTES
             '/': (context) =>
-                const StartupWrapper(), // 👈 show onboarding first time only
+                const StartupWrapper(), // show onboarding first time only
             '/login': (context) => const LoginPage(),
             '/register': (context) => const RegisterPage(),
             '/home': (context) => const WidgetTree(),

@@ -16,7 +16,9 @@ class _LoginPageState extends State<LoginPage> {
       TextEditingController();
   final TextEditingController _passwordController =
       TextEditingController();
+
   bool _isLoading = false;
+  bool _isPasswordVisible = false; 
 
   Future<void> _login() async {
     final email = _emailController.text.trim();
@@ -41,10 +43,7 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (user != null && mounted) {
-        Navigator.pushReplacementNamed(
-          context,
-          '/',
-        );
+        Navigator.pushReplacementNamed(context, '/');
       }
     } on FirebaseAuthException catch (e) {
       String message;
@@ -79,9 +78,11 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final theme = Theme.of(context); // ✅ Get current theme
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -91,12 +92,12 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 "Sign In",
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 32),
@@ -107,13 +108,21 @@ class _LoginPageState extends State<LoginPage> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: 'Email',
-                  prefixIcon: const Icon(Icons.email),
+                  prefixIcon: Icon(
+                    Icons.email,
+                    color: theme.iconTheme.color,
+                  ),
                   filled: true,
-                  fillColor: Colors.grey[100],
+                  fillColor: isDark
+                      ? Colors.grey[850]
+                      : Colors.grey[100],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
+                ),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -121,16 +130,33 @@ class _LoginPageState extends State<LoginPage> {
               // Password
               TextField(
                 controller: _passwordController,
-                obscureText: true,
+                obscureText: !_isPasswordVisible,
                 decoration: InputDecoration(
                   hintText: 'Password',
-                  prefixIcon: const Icon(Icons.lock),
+                  prefixIcon: Icon(
+                    Icons.lock,
+                    color: theme.iconTheme.color,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                      color: theme.iconTheme.color, // icon color adapts
+                    ),
+                    onPressed: () {
+                      setState(() => _isPasswordVisible = !_isPasswordVisible);
+                    },
+                  ),
                   filled: true,
-                  fillColor: Colors.grey[100],
+                  fillColor: isDark
+                      ? Colors.grey[850]
+                      : Colors.grey[100],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
+                ),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 32),
@@ -142,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
+                    backgroundColor: const Color(0xFF1565C0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
                         12,
@@ -168,7 +194,13 @@ class _LoginPageState extends State<LoginPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Don't have an account?"),
+                  Text(
+                    "Don't have an account?",
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+
                   TextButton(
                     onPressed: () {
                       Navigator.pushReplacementNamed(
@@ -176,10 +208,10 @@ class _LoginPageState extends State<LoginPage> {
                         '/register',
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       "Sign Up",
                       style: TextStyle(
-                        color: Colors.blueAccent,
+                        color: theme.colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

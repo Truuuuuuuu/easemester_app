@@ -23,18 +23,11 @@ class AppDrawer extends StatelessWidget {
           ValueListenableBuilder(
             valueListenable: isDarkModeNotifier,
             builder: (context, isDarkMode, child) {
-              return ListTile(
-                leading: Icon(
-                  isDarkMode
-                      ? Icons.dark_mode
-                      : Icons.light_mode,
-                ),
-                title: Text(
-                  isDarkMode ? "Dark Mode" : "Light Mode",
-                ),
-                onTap: () {
-                  isDarkModeNotifier.value = !isDarkMode;
-                },
+              return SwitchListTile(
+                secondary: Icon(Icons.dark_mode),
+                title: const Text("Dark Mode"),
+                value: isDarkMode,
+                onChanged: (value) => toggleTheme(),
               );
             },
           ),
