@@ -61,4 +61,36 @@ class FileRepository {
         .map((doc) => FileCardModel.fromMap(doc.data()))
         .toList();
   }
+
+  Future<void> updateFileSummary(
+    String uid,
+    String fileName,
+    Map<String, dynamic>? summaryJson,
+  ) async {
+    try {
+      final querySnapshot = await firestore
+          .collection('users')
+          .doc(uid)
+          .collection(
+            'studyHubFiles',
+          ) // 👈 adjust if your Firestore path differs
+          .where('fileName', isEqualTo: fileName)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final docId = querySnapshot.docs.first.id;
+        await firestore
+            .collection('users')
+            .doc(uid)
+            .collection('studyHubFiles')
+            .doc(docId)
+            .update({'summaryJson': summaryJson});
+        print("✅ Summary updated for $fileName");
+      } else {
+        print("⚠️ File not found: $fileName");
+      }
+    } catch (e) {
+      print("⚠️ Error updating summary: $e");
+    }
+  }
 }

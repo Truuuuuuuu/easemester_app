@@ -3,6 +3,7 @@ import 'package:easemester_app/helpers/dialog_helpers.dart';
 import 'package:easemester_app/models/profile_model.dart';
 import 'package:easemester_app/services/firestore_service.dart';
 import 'package:easemester_app/routes/navigation_helper.dart';
+import 'package:easemester_app/services/huggingface_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easemester_app/views/widgets/app_drawer.dart';
@@ -72,7 +73,7 @@ class _ProfilePageState extends State<ProfilePage> {
       await _auth.signOut();
 
       currentUserNotifier.value = null;
-      
+
       if (mounted) {
         NavigationHelper.goToLogin(context);
       }
@@ -221,6 +222,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       onPressed: _signOut,
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  
                 ],
               ),
             ),

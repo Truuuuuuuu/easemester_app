@@ -1,4 +1,6 @@
 import 'package:easemester_app/data/constant.dart';
+import 'package:easemester_app/services/file_extractor_service.dart';
+import 'package:easemester_app/views/pages/ai%20features/summary_page.dart';
 import 'package:easemester_app/views/widgets/cards/file_card.dart';
 import 'package:easemester_app/views/widgets/study_card.dart';
 import 'package:flutter/material.dart';
@@ -37,8 +39,7 @@ class HomePage extends StatelessWidget {
                       ),
                       AchievementItem(
                         title: "Pending Tasks",
-                        isPending:
-                            true, 
+                        isPending: true,
                       ),
                     ],
                   ),
@@ -68,7 +69,6 @@ class HomePage extends StatelessWidget {
                 controller: controller.tabController,
                 children: [
                   // Study Hub tab (files with AI features)
-                  // Study Hub tab (files with AI features)
                   GridView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount:
@@ -87,14 +87,11 @@ class HomePage extends StatelessWidget {
                         file:
                             file, // now passes FileCardModel
                         onTap: () {
-                          // Example: show AI features menu
-                          ScaffoldMessenger.of(
+                          Navigator.push(
                             context,
-                          ).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'AI features for: ${file.fileName}',
-                              ),
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  SummaryPage(file: file),
                             ),
                           );
                         },
