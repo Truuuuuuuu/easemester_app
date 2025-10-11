@@ -1,3 +1,4 @@
+import 'package:easemester_app/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
 import '../controllers/notes_controller.dart';
 import '../controllers/checklist_controller.dart';
@@ -71,6 +72,46 @@ Future<void> confirmDeleteTasks(
 
   if (confirm == true) {
     controller.deleteSelected();
+  }
+}
+
+//confirm deletion for files
+Future<void> confirmDeleteFile(
+  BuildContext context,
+  HomeController controller,
+  String fileId,
+) async {
+  final confirm = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text("Delete File"),
+      content: const Text(
+        "Are you sure you want to delete this file?",
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text("Cancel"),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () => Navigator.pop(context, true),
+          child: const Text("Delete"),
+        ),
+      ],
+    ),
+  );
+
+  if (confirm == true) {
+    await controller.deleteFile(fileId);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("File deleted successfully"),
+      ),
+    );
   }
 }
 

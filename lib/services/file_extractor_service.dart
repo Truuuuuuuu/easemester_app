@@ -10,8 +10,9 @@ class FileExtractor {
   /// 🔹 Extract text from a local path or remote URL
   /// Avoids re-extracting if text is already saved in Firestore.
   static Future<String?> pickAndExtractFromPath(
-    String filePath,
-  ) async {
+    String filePath, {
+    required String fileId,
+  }) async {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception('No logged-in user');
@@ -24,7 +25,7 @@ class FileExtractor {
           .collection('users')
           .doc(uid)
           .collection('files')
-          .doc(fileName)
+          .doc(fileId)
           .get();
 
       if (existingDoc.exists &&
@@ -70,7 +71,7 @@ class FileExtractor {
           .collection('users')
           .doc(uid)
           .collection('files')
-          .doc(fileName)
+          .doc(fileId)
           .set({'fileText': text}, SetOptions(merge: true));
 
       print(

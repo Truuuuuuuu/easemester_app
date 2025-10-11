@@ -10,6 +10,21 @@ class HuggingFaceService {
     apiKey = dotenv.env['HF_API_KEY'] ?? '';
   }
 
+  /// ✅ Helper: Split long text into manageable chunks 
+  List<String> _chunkText(
+    String text, {
+    int chunkSize = 200,
+  }) {
+    final words = text.split(' ');
+    List<String> chunks = [];
+    for (int i = 0; i < words.length; i += chunkSize) {
+      final chunk = words.skip(i).take(chunkSize).join(' ');
+      chunks.add(chunk);
+    }
+    return chunks;
+  }
+
+  /// 🔹 Basic summarization for a single text chunk
   Future<String> generateSummary(String text) async {
     try {
       final response = await http.post(
@@ -23,8 +38,8 @@ class HuggingFaceService {
         body: jsonEncode({
           'inputs': text,
           'parameters': {
-            'max_length': 400,
-            'min_length': 100,
+            'max_length': 200,
+            'min_length': 50,
           },
         }),
       );
@@ -32,10 +47,26 @@ class HuggingFaceService {
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
 
-        // Hugging Face response format: [{"summary_text": "..."}]
         if (decoded is List && decoded.isNotEmpty) {
-          final summary = decoded[0]['summary_text'];
-          return summary ?? "No summary generated.";
+          final first = decoded[0];
+          if (first is Map &&
+              first.containsKey('summary_text')) {
+            return first['summary_text'] ??
+                "No summary generated.";
+          } else if (first is Map &&
+              first.containsKey('error')) {
+            print(
+              "❌ API returned error: ${first['error']}",
+            );
+            return "API Error: ${first['error']}";
+          }
+        } else if (decoded is Map &&
+            decoded.containsKey('error')) {
+          // When Hugging Face returns an error object instead of a list
+          print(
+            "❌ API returned error: ${decoded['error']}",
+          );
+          return "API Error: ${decoded['error']}";
         }
         return "Invalid response format.";
       } else {
@@ -48,5 +79,27 @@ class HuggingFaceService {
       print("❌ Exception: $e");
       return "Exception: $e";
     }
+  }
+
+  /// ✅ High-level function that handles large text by chunking
+  Future<String> summarizeLongText(String fullText) async {
+    final chunks = _chunkText(fullText);
+    List<String> summaries = [];
+
+    for (final chunk in chunks) {
+      if (chunk.trim().isEmpty) continue;
+      final summary = await generateSummary(chunk);
+      summaries.add(summary);
+    }
+    
+
+    // Combine all partial summaries
+    final combined = summaries.join(' ');
+
+    // Optionally, run one final summarization pass to condense further
+    print("🧠 Combining all partial summaries...");
+    final finalSummary = await generateSummary(combined);
+
+    return finalSummary;
   }
 }

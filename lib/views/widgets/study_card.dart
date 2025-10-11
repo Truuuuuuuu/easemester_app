@@ -4,11 +4,13 @@ import 'package:easemester_app/models/file_card_model.dart';
 class StudyCard extends StatelessWidget {
   final FileCardModel file;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   const StudyCard({
     super.key,
     required this.file,
     required this.onTap,
+    this.onLongPress,
   });
 
   @override
@@ -20,6 +22,7 @@ class StudyCard extends StatelessWidget {
       ),
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress, 
         borderRadius: BorderRadius.circular(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

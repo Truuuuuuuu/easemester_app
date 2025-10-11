@@ -7,8 +7,11 @@ class SummaryService {
   static Future<Map<String, dynamic>> summarizeText(
     String text,
   ) async {
-    final summary = await _hfService.generateSummary(text);
+    final summary = await _hfService.summarizeLongText(text);
     print("🧠 Summary in terminal: $summary");
     return {'summary_text': summary};
   }
 }
+
+
+

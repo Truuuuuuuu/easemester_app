@@ -1,5 +1,5 @@
 import 'package:easemester_app/data/constant.dart';
-import 'package:easemester_app/services/file_extractor_service.dart';
+import 'package:easemester_app/helpers/dialog_helpers.dart';
 import 'package:easemester_app/views/pages/ai%20features/summary_page.dart';
 import 'package:easemester_app/views/widgets/cards/file_card.dart';
 import 'package:easemester_app/views/widgets/study_card.dart';
@@ -84,8 +84,7 @@ class HomePage extends StatelessWidget {
                       final file = controller
                           .studyHubCards[index]; // FileCardModel
                       return StudyCard(
-                        file:
-                            file, // now passes FileCardModel
+                        file: file,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -93,6 +92,13 @@ class HomePage extends StatelessWidget {
                               builder: (_) =>
                                   SummaryPage(file: file),
                             ),
+                          );
+                        },
+                        onLongPress: () {
+                          confirmDeleteFile(
+                            context,
+                            controller,
+                            file.id!,
                           );
                         },
                       );
@@ -121,6 +127,13 @@ class HomePage extends StatelessWidget {
                                   'Tapped file: ${file.fileName}',
                                 ),
                               ),
+                            );
+                          },
+                          onLongPress: () {
+                            confirmDeleteFile(
+                              context,
+                              controller,
+                              file.id!,
                             );
                           },
                         ),
