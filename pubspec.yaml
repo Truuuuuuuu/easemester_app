@@ -54,6 +54,8 @@ dependencies:
   docx_to_text: ^1.0.1
   syncfusion_flutter_pdf: ^24.1.46
   path_provider: ^2.1.5
+  crypto: ^3.0.6
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:

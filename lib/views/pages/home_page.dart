@@ -98,7 +98,7 @@ class HomePage extends StatelessWidget {
                           confirmDeleteFile(
                             context,
                             controller,
-                            file.id!,
+                            file,
                           );
                         },
                       );
@@ -133,7 +133,7 @@ class HomePage extends StatelessWidget {
                             confirmDeleteFile(
                               context,
                               controller,
-                              file.id!,
+                              file,
                             );
                           },
                         ),

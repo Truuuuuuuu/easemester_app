@@ -9,6 +9,8 @@ class FileCardModel {
   final String? fileText;
   final Map<String, dynamic>? summaryJson;
   final String? studyHubFileId; // Reference to the StudyHub file ID
+  final String publicId;
+ 
 
   FileCardModel({
     required this.id,
@@ -19,6 +21,8 @@ class FileCardModel {
     this.fileText,
     this.summaryJson,
     this.studyHubFileId,
+    required this.publicId,
+
   });
 
   // Convert Firestore document to FileCardModel
@@ -44,6 +48,8 @@ class FileCardModel {
           ? Map<String, dynamic>.from(data['summaryJson'])
           : null,
       studyHubFileId: data['studyHubFileId'],
+      publicId: data['publicId'],
+  
     );
   }
 
@@ -56,6 +62,8 @@ class FileCardModel {
           timestamp ?? FieldValue.serverTimestamp(),
       'description': description,
       'fileText': fileText,
+      'publicId': publicId,
+
     };
 
     if (summaryJson != null) {
@@ -65,6 +73,7 @@ class FileCardModel {
     if (studyHubFileId != null) {
       map['studyHubFileId'] = studyHubFileId;
     }
+
 
     return map;
   }
@@ -77,6 +86,8 @@ class FileCardModel {
     String? fileText,
     Map<String, dynamic>? summaryJson,
     String? studyHubFileId,
+    String? publicId,
+    String? resourceType,
   }) {
     return FileCardModel(
       id: id ?? this.id,
@@ -86,6 +97,8 @@ class FileCardModel {
       fileText: fileText ?? this.fileText,
       summaryJson: summaryJson ?? this.summaryJson,
       studyHubFileId: studyHubFileId ?? this.studyHubFileId,
+      publicId: publicId ?? this.publicId,
+ 
     );
   }
 }

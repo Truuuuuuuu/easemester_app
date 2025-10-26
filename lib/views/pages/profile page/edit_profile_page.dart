@@ -69,17 +69,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     setState(() => isUploadingPhoto = true);
 
-    final uploadedUrl = await CloudinaryService()
+    final uploadResult = await CloudinaryService()
         .uploadFile(file);
 
-    setState(() {
-      isUploadingPhoto = false;
-      if (uploadedUrl != null) {
-        newProfileImageUrl = uploadedUrl;
-      }
-    });
+    setState(() => isUploadingPhoto = false);
 
-    if (uploadedUrl == null) {
+    if (uploadResult != null) {
+      final fileUrl = uploadResult['url'];
+      final publicId = uploadResult['public_id'];
+
+      // Save URL for preview or Firestore update
+      setState(() {
+        newProfileImageUrl = fileUrl;
+      });
+
+      print('✅ Uploaded successfully: $fileUrl');
+      print('📦 Cloudinary public_id: $publicId');
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Failed to upload image'),

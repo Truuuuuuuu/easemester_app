@@ -19,6 +19,8 @@ class HomeController extends ChangeNotifier {
   StreamSubscription<List<FileCardModel>>? _studyHubSub;
   StreamSubscription<List<FileCardModel>>? _filesSub;
 
+  final FirebaseFirestore _firestore =
+      FirebaseFirestore.instance;
   final CloudinaryService _cloudinaryService =
       CloudinaryService();
   final FileRepository _fileRepository = FileRepository(
@@ -68,10 +70,12 @@ class HomeController extends ChangeNotifier {
       final uid = FirebaseAuth.instance.currentUser!.uid;
 
       // Upload to Cloudinary
-      final secureUrl = await _cloudinaryService.uploadFile(
-        file,
-      );
-      if (secureUrl == null) return;
+      final uploadResult = await _cloudinaryService
+          .uploadFile(file);
+      if (uploadResult == null) return;
+
+      final fileUrl = uploadResult['url'];
+      final publicId = uploadResult['public_id'];
 
       // ----------------------
       // StudyHubFiles: metadata + extracted + summary
@@ -85,7 +89,8 @@ class HomeController extends ChangeNotifier {
       final tempFile = FileCardModel(
         id: studyHubDocRef.id,
         fileName: result.files.first.name,
-        fileUrl: secureUrl,
+        fileUrl: fileUrl,
+        publicId: publicId,
         description:
             "Uploaded on ${DateTime.now().toLocal()}",
       );
@@ -126,7 +131,8 @@ class HomeController extends ChangeNotifier {
         id: studyHubDocRef
             .id, // same ID for optional mapping or separate if desired
         fileName: result.files.first.name,
-        fileUrl: secureUrl,
+        fileUrl: fileUrl,
+        publicId: publicId,
         description:
             "Uploaded on ${DateTime.now().toLocal()}",
         fileText: null,
@@ -198,18 +204,66 @@ class HomeController extends ChangeNotifier {
     super.dispose();
   }
 
-  Future<void> deleteFile(String fileId) async {
+  Future<void> deleteFile(
+    FileCardModel file,
+    BuildContext context,
+  ) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
     try {
-      final uid = FirebaseAuth.instance.currentUser!.uid;
-      await _fileRepository.deleteFile(uid, fileId);
+      // 1️⃣ Delete from Cloudinary
+      if (file.publicId.isNotEmpty) {
+        try {
+          await _cloudinaryService.deleteFileByPublicId(
+            file.publicId,
+          );
+          print(
+            "✅ Cloudinary file deleted: ${file.fileName}",
+          );
+        } catch (e) {
+          print("⚠️ Cloudinary delete error: $e");
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Cloudinary delete failed: $e"),
+            ),
+          );
+        }
+      }
 
-      studyHubCards.removeWhere((f) => f.id == fileId);
-      filesCards.removeWhere((f) => f.id == fileId);
+      // 2️⃣ Delete from Firestore
+      await _fileRepository.firestore
+          .collection('users')
+          .doc(uid)
+          .collection('files')
+          .doc(file.id)
+          .delete();
 
+      await _fileRepository.firestore
+          .collection('users')
+          .doc(uid)
+          .collection('studyHubFiles')
+          .doc(file.id)
+          .delete();
+
+      print("✅ Firestore file deleted: ${file.fileName}");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("File deleted successfully"),
+        ),
+      );
+
+      // 3️⃣ Update local state
+      filesCards.removeWhere((f) => f.id == file.id);
+      studyHubCards.removeWhere((f) => f.id == file.id);
       notifyListeners();
-      print("✅ File deleted successfully: $fileId");
     } catch (e) {
-      print("⚠️ Error deleting file: $e");
+      print("❌ Error deleting file: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to delete file: $e"),
+        ),
+      );
     }
   }
 }

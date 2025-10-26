@@ -84,7 +84,7 @@ class _RegisterPageState extends State<RegisterPage> {
         // Save to Firestore
         await FirestoreService().saveUser(newUser);
 
-        //  Update notifier immediately so AppBar shows correct data
+        // Update notifier immediately so AppBar shows correct data
         currentUserNotifier.value = newUser;
 
         Navigator.pushReplacementNamed(context, '/home');
@@ -120,9 +120,12 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final theme = Theme.of(context); // ✅ Get current theme
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme
+          .scaffoldBackgroundColor, // ✅ Theme-aware background
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(
@@ -132,19 +135,24 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 "Create Account",
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: theme
+                      .colorScheme
+                      .onSurface, // ✅ Theme-aware text color
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 "Sign up to continue",
                 style: TextStyle(
-                  color: Colors.black54,
+                  color: theme.colorScheme.onSurface
+                      .withOpacity(
+                        0.7,
+                      ), // ✅ Theme-aware secondary text
                   fontSize: 16,
                 ),
               ),
@@ -155,13 +163,26 @@ class _RegisterPageState extends State<RegisterPage> {
                 controller: _nameController,
                 decoration: InputDecoration(
                   hintText: 'Full Name',
-                  prefixIcon: const Icon(Icons.person),
+                  prefixIcon: Icon(
+                    Icons.person,
+                    color: theme
+                        .iconTheme
+                        .color, // ✅ Theme-aware icon color
+                  ),
                   filled: true,
-                  fillColor: Colors.grey[100],
+                  fillColor: isDark
+                      ? Colors.grey[850]
+                      : Colors
+                            .grey[100], // ✅ Conditional fill color
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
+                ),
+                style: TextStyle(
+                  color: theme
+                      .colorScheme
+                      .onSurface, // ✅ Theme-aware text input color
                 ),
               ),
               const SizedBox(height: 16),
@@ -172,13 +193,26 @@ class _RegisterPageState extends State<RegisterPage> {
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: 'Email',
-                  prefixIcon: const Icon(Icons.email),
+                  prefixIcon: Icon(
+                    Icons.email,
+                    color: theme
+                        .iconTheme
+                        .color, // ✅ Theme-aware icon color
+                  ),
                   filled: true,
-                  fillColor: Colors.grey[100],
+                  fillColor: isDark
+                      ? Colors.grey[850]
+                      : Colors
+                            .grey[100], // ✅ Conditional fill color
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
+                ),
+                style: TextStyle(
+                  color: theme
+                      .colorScheme
+                      .onSurface, // ✅ Theme-aware text input color
                 ),
               ),
               const SizedBox(height: 16),
@@ -189,13 +223,26 @@ class _RegisterPageState extends State<RegisterPage> {
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: 'Password',
-                  prefixIcon: const Icon(Icons.lock),
+                  prefixIcon: Icon(
+                    Icons.lock,
+                    color: theme
+                        .iconTheme
+                        .color, // ✅ Theme-aware icon color
+                  ),
                   filled: true,
-                  fillColor: Colors.grey[100],
+                  fillColor: isDark
+                      ? Colors.grey[850]
+                      : Colors
+                            .grey[100], // ✅ Conditional fill color
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
+                ),
+                style: TextStyle(
+                  color: theme
+                      .colorScheme
+                      .onSurface, // ✅ Theme-aware text input color
                 ),
               ),
               const SizedBox(height: 32),
@@ -207,7 +254,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _register,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
+                    backgroundColor: theme
+                        .colorScheme
+                        .primary, // ✅ Theme-aware button color
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
                         12,
@@ -218,12 +267,14 @@ class _RegisterPageState extends State<RegisterPage> {
                       ? const CircularProgressIndicator(
                           color: Colors.white,
                         )
-                      : const Text(
+                      : Text(
                           "Register",
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: theme
+                                .colorScheme
+                                .onPrimary, // ✅ Theme-aware button text color
                           ),
                         ),
                 ),
@@ -233,7 +284,14 @@ class _RegisterPageState extends State<RegisterPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Already have an account?"),
+                  Text(
+                    "Already have an account?",
+                    style: TextStyle(
+                      color: theme
+                          .colorScheme
+                          .onSurface, // ✅ Theme-aware text color
+                    ),
+                  ),
                   TextButton(
                     onPressed: () {
                       Navigator.pushReplacementNamed(
@@ -241,10 +299,12 @@ class _RegisterPageState extends State<RegisterPage> {
                         '/login',
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       "Sign In",
                       style: TextStyle(
-                        color: Colors.blueAccent,
+                        color: theme
+                            .colorScheme
+                            .primary, // ✅ Theme-aware link color
                         fontWeight: FontWeight.bold,
                       ),
                     ),

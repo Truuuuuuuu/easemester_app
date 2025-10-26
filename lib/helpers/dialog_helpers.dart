@@ -1,4 +1,5 @@
 import 'package:easemester_app/controllers/home_controller.dart';
+import 'package:easemester_app/models/file_card_model.dart';
 import 'package:flutter/material.dart';
 import '../controllers/notes_controller.dart';
 import '../controllers/checklist_controller.dart';
@@ -76,10 +77,11 @@ Future<void> confirmDeleteTasks(
 }
 
 //confirm deletion for files
+// ✅ Confirm deletion for files
 Future<void> confirmDeleteFile(
   BuildContext context,
   HomeController controller,
-  String fileId,
+  FileCardModel file, // Accepts only FileCardModel now
 ) async {
   final confirm = await showDialog<bool>(
     context: context,
@@ -106,12 +108,10 @@ Future<void> confirmDeleteFile(
   );
 
   if (confirm == true) {
-    await controller.deleteFile(fileId);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("File deleted successfully"),
-      ),
-    );
+    await controller.deleteFile(
+      file,
+      context,
+    ); // Pass file object + context
   }
 }
 
