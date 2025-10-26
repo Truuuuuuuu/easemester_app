@@ -3,14 +3,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class HuggingFaceService {
-  final String modelId = 'sshleifer/distilbart-cnn-12-6';
+  final String modelId = 'facebook/bart-large-cnn';
   late final String apiKey;
 
   HuggingFaceService() {
     apiKey = dotenv.env['HF_API_KEY'] ?? '';
   }
 
-  /// ✅ Helper: Split long text into manageable chunks 
+  ///Split long text into manageable chunks
   List<String> _chunkText(
     String text, {
     int chunkSize = 200,
@@ -24,12 +24,12 @@ class HuggingFaceService {
     return chunks;
   }
 
-  /// 🔹 Basic summarization for a single text chunk
+  ///Basic summarization for a single text chunk
   Future<String> generateSummary(String text) async {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://api-inference.huggingface.co/models/$modelId',
+          'https://router.huggingface.co/hf-inference/models/$modelId',
         ),
         headers: {
           'Authorization': 'Bearer $apiKey',
@@ -81,7 +81,7 @@ class HuggingFaceService {
     }
   }
 
-  /// ✅ High-level function that handles large text by chunking
+  /// High-level function that handles large text by chunking
   Future<String> summarizeLongText(String fullText) async {
     final chunks = _chunkText(fullText);
     List<String> summaries = [];
@@ -91,7 +91,6 @@ class HuggingFaceService {
       final summary = await generateSummary(chunk);
       summaries.add(summary);
     }
-    
 
     // Combine all partial summaries
     final combined = summaries.join(' ');
