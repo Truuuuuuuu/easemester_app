@@ -230,7 +230,7 @@ class HomeController extends ChangeNotifier {
         }
       }
 
-      // 2️⃣ Delete from Firestore
+      // 2️Delete from Firestore
       await _fileRepository.firestore
           .collection('users')
           .doc(uid)

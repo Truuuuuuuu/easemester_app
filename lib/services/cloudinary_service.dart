@@ -42,9 +42,10 @@ class CloudinaryService {
         'upload_preset': uploadPreset,
         'signature': signature,
       });
-
+      final resourceType = file.path.endsWith('.pdf') ? 'raw' : 'auto';
+      
       final response = await _dio.post(
-        'https://api.cloudinary.com/v1_1/$cloudName/auto/upload',
+        'https://api.cloudinary.com/v1_1/$cloudName/$resourceType/upload',
         data: formData,
       );
 

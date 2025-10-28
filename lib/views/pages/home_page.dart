@@ -1,5 +1,6 @@
 import 'package:easemester_app/data/constant.dart';
 import 'package:easemester_app/helpers/dialog_helpers.dart';
+import 'package:easemester_app/views/pages/ai%20features/ai_features_page.dart';
 import 'package:easemester_app/views/pages/ai%20features/summary_page.dart';
 import 'package:easemester_app/views/widgets/cards/file_card.dart';
 import 'package:easemester_app/views/widgets/study_card.dart';
@@ -90,7 +91,8 @@ class HomePage extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (_) =>
-                                  SummaryPage(file: file),
+                                    FeaturePage(file: file),
+                                  
                             ),
                           );
                         },
