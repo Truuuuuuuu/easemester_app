@@ -1,5 +1,5 @@
 import 'package:easemester_app/models/file_card_model.dart';
-import 'package:easemester_app/views/pages/ai%20features/flash_cards_page.dart';
+import 'package:easemester_app/views/pages/ai%20features/flash_card_page.dart';
 import 'package:easemester_app/views/pages/ai%20features/short_quiz_page.dart';
 import 'package:flutter/material.dart';
 import 'summary_page.dart';
@@ -20,7 +20,7 @@ class FeaturePage extends StatelessWidget {
       {
         'title': 'Flash Cards',
         'icon': Icons.style_outlined,
-        'route': FlashCardsPage(file: file),
+        'route': FlashCardPage(file: file),
       },
       {
         'title': 'Short Quiz',

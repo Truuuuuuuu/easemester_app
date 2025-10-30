@@ -116,7 +116,11 @@ class HomeController extends ChangeNotifier {
           final quiz = await openAIService
               .generateShortQuiz(summary);
 
-          aiFeatures = {"summary": summary, "quiz": quiz};
+          print("📘 Generating flashcards using OpenAI...");
+          final flashcards = await openAIService
+              .generateFlashcards(extractedText);
+
+          aiFeatures = {"summary": summary, "quiz": quiz, "flashcards": flashcards};
         }
       }
 

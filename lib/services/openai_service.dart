@@ -147,4 +147,99 @@ Respond *only* in pure JSON (no markdown or text outside the JSON), in this exac
       ];
     }
   }
+
+  /// Generate flashcards (term + definition pairs)
+  Future<List<Map<String, String>>> generateFlashcards(
+    String text,
+  ) async {
+    print("📘 Generating flashcards...");
+    try {
+      final response = await http.post(
+        Uri.parse(baseUrl),
+        headers: {
+          'Authorization': 'Bearer $apiKey',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          "model": "gpt-4o-mini",
+          "messages": [
+            {
+              "role": "system",
+              "content":
+                  "You are a helpful assistant that creates flashcards from provided text.",
+            },
+            {
+              "role": "user",
+              "content":
+                  """
+Create 5 flashcards from the text below. Respond ONLY with a JSON array in this exact format (no markdown, no extra text):
+
+[
+  {"term": "Term 1", "definition": "Definition 1"},
+  {"term": "Term 2", "definition": "Definition 2"}
+]
+
+Text:
+$text
+""",
+            },
+          ],
+          "max_tokens": 400,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        String content =
+            decoded['choices'][0]['message']['content']
+                .toString()
+                .trim();
+
+        // Remove triple-backtick fences if present
+        content = content
+            .replaceAll(RegExp(r'```(json)?'), '')
+            .trim();
+
+        // Try parse
+        try {
+          final List<dynamic> parsed = jsonDecode(content);
+          final flashcards = parsed
+              .map<Map<String, String>>(
+                (e) => {
+                  'term': e['term'].toString(),
+                  'definition': e['definition'].toString(),
+                },
+              )
+              .toList();
+          print(
+            "✅ Parsed ${flashcards.length} flashcards.",
+          );
+          return flashcards;
+        } catch (err) {
+          print("⚠️ Failed to parse flashcards JSON: $err");
+          return [
+            {
+              'term': 'Flashcards parse error',
+              'definition': content,
+            },
+          ];
+        }
+      } else {
+        print(
+          "❌ API Error ${response.statusCode}: ${response.body}",
+        );
+        return [
+          {
+            'term': 'API Error',
+            'definition': response.body,
+          },
+        ];
+      }
+    } catch (e) {
+      print("❌ Exception in generateFlashcards: $e");
+      return [
+        {'term': 'Exception', 'definition': e.toString()},
+      ];
+    }
+  }
 }
