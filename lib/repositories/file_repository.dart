@@ -94,7 +94,7 @@ class FileRepository {
   Future<void> updateFileSummary(
     String uid,
     String fileId,
-    Map<String, dynamic>? summaryJson,
+    Map<String, dynamic>? summary,
   ) async {
     final docRef = firestore
         .collection('users')
@@ -102,7 +102,7 @@ class FileRepository {
         .collection('studyHubFiles')
         .doc(fileId);
 
-    await docRef.update({'summaryJson': summaryJson});
+    await docRef.update({'aiFeatures': summary});
   }
 
   /// Delete file from both StudyHubFiles and Files tab

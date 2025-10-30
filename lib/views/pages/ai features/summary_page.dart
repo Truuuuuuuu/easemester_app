@@ -9,7 +9,7 @@ class SummaryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final summaryText = file.summaryJson?['summary_text'] ?? "No summary available.";
+    final summaryText = file.aiFeatures?['summary'] ?? "No summary available.";
     final extractedText = file.fileText ?? "No extracted text found.";
 
     return Scaffold(

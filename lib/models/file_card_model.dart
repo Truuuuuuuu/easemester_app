@@ -7,7 +7,7 @@ class FileCardModel {
   final DateTime? timestamp;
   final String? description;
   final String? fileText;
-  final Map<String, dynamic>? summaryJson;
+  final Map<String, dynamic>? aiFeatures;
   final String? studyHubFileId; // Reference to the StudyHub file ID
   final String publicId;
  
@@ -19,7 +19,7 @@ class FileCardModel {
     this.timestamp,
     this.description,
     this.fileText,
-    this.summaryJson,
+    this.aiFeatures,
     this.studyHubFileId,
     required this.publicId,
 
@@ -44,8 +44,8 @@ class FileCardModel {
           : null,
       description: data['description'],
       fileText: data['fileText'],
-      summaryJson: data['summaryJson'] != null
-          ? Map<String, dynamic>.from(data['summaryJson'])
+      aiFeatures: data['aiFeatures'] != null
+          ? Map<String, dynamic>.from(data['aiFeatures'])
           : null,
       studyHubFileId: data['studyHubFileId'],
       publicId: data['publicId'],
@@ -66,8 +66,8 @@ class FileCardModel {
 
     };
 
-    if (summaryJson != null) {
-      map['summaryJson'] = summaryJson;
+    if (aiFeatures != null) {
+      map['aiFeatures'] = aiFeatures;
     }
 
     if (studyHubFileId != null) {
@@ -84,7 +84,7 @@ class FileCardModel {
     String? fileUrl,
     String? description,
     String? fileText,
-    Map<String, dynamic>? summaryJson,
+    Map<String, dynamic>? aiFeatures,
     String? studyHubFileId,
     String? publicId,
     String? resourceType,
@@ -95,7 +95,7 @@ class FileCardModel {
       fileUrl: fileUrl ?? this.fileUrl,
       description: description ?? this.description,
       fileText: fileText ?? this.fileText,
-      summaryJson: summaryJson ?? this.summaryJson,
+      aiFeatures: aiFeatures ?? this.aiFeatures,
       studyHubFileId: studyHubFileId ?? this.studyHubFileId,
       publicId: publicId ?? this.publicId,
  

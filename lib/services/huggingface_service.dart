@@ -3,7 +3,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class HuggingFaceService {
-  final String modelId = 'facebook/bart-large-cnn';
+  final String summaryModelId = 'facebook/bart-large-cnn';
+  final String shortQuizModelId =
+      'valhalla/t5-small-qg-prepend';
   late final String apiKey;
 
   HuggingFaceService() {
@@ -29,7 +31,8 @@ class HuggingFaceService {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://router.huggingface.co/hf-inference/models/$modelId',
+          'https://api-inference.huggingface.co/models/$summaryModelId',
+          //'https://api-inference.huggingface.co/models/$summaryModelId',
         ),
         headers: {
           'Authorization': 'Bearer $apiKey',
@@ -38,7 +41,7 @@ class HuggingFaceService {
         body: jsonEncode({
           'inputs': text,
           'parameters': {
-            "min_length": 30, 
+            "min_length": 30,
             "max_length": 130,
             "do_sample": false,
           },
@@ -101,5 +104,114 @@ class HuggingFaceService {
     final finalSummary = await generateSummary(combined);
 
     return finalSummary;
+  }
+
+  /// Generate a 10-item short quiz (question + answer)
+  Future<List<Map<String, String>>> generateShortQuiz(
+    String text,
+  ) async {
+    print("🚀 Starting generateShortQuiz...");
+    print(
+      "📘 Input text: ${text.substring(0, text.length > 100 ? 100 : text.length)}...",
+    );
+    print("🔑 Using model: $shortQuizModelId");
+    print("🔐 API Key present: ${apiKey.isNotEmpty}");
+
+    try {
+      print("🌐 Sending request to Hugging Face API...");
+      final response = await http.post(
+        Uri.parse(
+          'https://api-inference.huggingface.co/models/$shortQuizModelId',
+        ),
+        headers: {
+          'Authorization': 'Bearer $apiKey',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'inputs': text,
+          'parameters': {
+            'max_length': 180,
+            'num_return_sequences': 10,
+            'temperature': 0.9,
+          },
+        }),
+      );
+
+      print(
+        "📩 Response received. Status: ${response.statusCode}",
+      );
+
+      if (response.statusCode == 200) {
+        print("✅ Successful response. Decoding JSON...");
+        final decoded = jsonDecode(response.body);
+
+        print("🧩 Decoded type: ${decoded.runtimeType}");
+        print(
+          "🔍 Decoded content preview: ${response.body.substring(0, response.body.length > 300 ? 300 : response.body.length)}",
+        );
+
+        if (decoded is List && decoded.isNotEmpty) {
+          print(
+            "📄 Response is a non-empty list. Parsing generated questions...",
+          );
+          final result = decoded
+              .map<Map<String, String>>((e) {
+                final raw =
+                    e['generated_text']?.toString() ??
+                    e.toString();
+                print("✏️ Raw generated text: $raw");
+                final parts = raw.split('?');
+                final question = parts.first.trim() + '?';
+                final answer = parts.length > 1
+                    ? parts.last.trim()
+                    : 'N/A';
+                print(
+                  "🧠 Parsed Q: $question | A: $answer",
+                );
+                return {
+                  'question': question,
+                  'answer': answer,
+                };
+              })
+              .take(10)
+              .toList();
+          print(
+            "✅ Successfully parsed ${result.length} quiz items.",
+          );
+          return result;
+        } else {
+          print(
+            "⚠️ Unexpected response structure. Decoded: $decoded",
+          );
+          return [
+            {
+              'question': 'Unexpected response format.',
+              'answer': decoded.toString(),
+            },
+          ];
+        }
+      } else {
+        print(
+          "❌ API Error ${response.statusCode}: ${response.body}",
+        );
+        return [
+          {
+            'question': 'Error fetching quiz.',
+            'answer':
+                'Status ${response.statusCode}: ${response.body}',
+          },
+        ];
+      }
+    } catch (e, stack) {
+      print("💥 Exception in generateShortQuiz: $e");
+      print("🧾 Stack trace:\n$stack");
+      return [
+        {
+          'question': 'Exception occurred.',
+          'answer': e.toString(),
+        },
+      ];
+    }
+
   }
 }

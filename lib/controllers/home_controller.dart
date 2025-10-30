@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easemester_app/services/openai_service.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +9,6 @@ import '../models/file_card_model.dart';
 import '../repositories/file_repository.dart';
 import '../services/cloudinary_service.dart';
 import '../services/file_extractor_service.dart';
-import '../services/summary_service.dart';
 
 class HomeController extends ChangeNotifier {
   final TabController tabController;
@@ -69,7 +69,7 @@ class HomeController extends ChangeNotifier {
       final file = File(path);
       final uid = FirebaseAuth.instance.currentUser!.uid;
 
-      // Upload to Cloudinary
+      // 1️⃣ Upload to Cloudinary
       final uploadResult = await _cloudinaryService
           .uploadFile(file);
       if (uploadResult == null) return;
@@ -77,10 +77,8 @@ class HomeController extends ChangeNotifier {
       final fileUrl = uploadResult['url'];
       final publicId = uploadResult['public_id'];
 
-      // ----------------------
-      // StudyHubFiles: metadata + extracted + summary
-      // ----------------------
-      final studyHubDocRef = FirebaseFirestore.instance
+      // 2️⃣ Create Firestore reference
+      final studyHubDocRef = _firestore
           .collection('users')
           .doc(uid)
           .collection('studyHubFiles')
@@ -96,8 +94,9 @@ class HomeController extends ChangeNotifier {
       );
 
       String? extractedText;
-      Map<String, dynamic>? summaryJson;
+      Map<String, dynamic>? aiFeatures;
 
+      // 3️⃣ Extract text + generate AI content (summary + quiz)
       if (isStudyHub) {
         extractedText =
             await FileExtractor.pickAndExtractFromPath(
@@ -107,15 +106,24 @@ class HomeController extends ChangeNotifier {
 
         if (extractedText != null &&
             extractedText.isNotEmpty) {
-          summaryJson = await SummaryService.summarizeText(
-            extractedText,
-          );
+          final openAIService = OpenAIService();
+
+          print("🧠 Generating summary using OpenAI...");
+          final summary = await openAIService
+              .generateSummary(extractedText);
+
+          print("🚀 Generating short quiz using OpenAI...");
+          final quiz = await openAIService
+              .generateShortQuiz(summary);
+
+          aiFeatures = {"summary": summary, "quiz": quiz};
         }
       }
 
+      // 4️⃣ Save to Firestore
       final fullFile = tempFile.copyWith(
         fileText: extractedText,
-        summaryJson: summaryJson,
+        aiFeatures: aiFeatures,
       );
 
       await _fileRepository.addStudyHubFile(
@@ -124,19 +132,16 @@ class HomeController extends ChangeNotifier {
         studyHubDocRef.id,
       );
 
-      // ----------------------
-      // Files: metadata only
-      // ----------------------
+      // 5️⃣ Add to "Files" tab (metadata only)
       final metadataFile = FileCardModel(
-        id: studyHubDocRef
-            .id, // same ID for optional mapping or separate if desired
+        id: studyHubDocRef.id,
         fileName: result.files.first.name,
         fileUrl: fileUrl,
         publicId: publicId,
         description:
             "Uploaded on ${DateTime.now().toLocal()}",
         fileText: null,
-        summaryJson: null,
+        aiFeatures: null,
       );
 
       await _fileRepository.addFilesTabFile(
@@ -153,50 +158,6 @@ class HomeController extends ChangeNotifier {
     }
   }
 
-  /// Summarize and update
-  Future<String?> summarizeAndSave(
-    FileCardModel file,
-  ) async {
-    try {
-      final text =
-          file.fileText ??
-          await FileExtractor.pickAndExtractFromPath(
-            file.fileUrl,
-            fileId: file.id!,
-          );
-
-      if (text == null || text.isEmpty)
-        return "No text found.";
-
-      final summaryJson =
-          await SummaryService.summarizeText(text);
-
-      final uid = FirebaseAuth.instance.currentUser!.uid;
-      await _fileRepository.updateFileSummary(
-        uid,
-        file.id!,
-        summaryJson,
-      );
-
-      final updatedFile = file.copyWith(
-        summaryJson: summaryJson,
-        fileText: text,
-      );
-
-      final index = studyHubCards.indexWhere(
-        (f) => f.id == file.id,
-      );
-      if (index != -1) studyHubCards[index] = updatedFile;
-
-      notifyListeners();
-
-      return summaryJson['summary'] ?? 'No summary found';
-    } catch (e) {
-      print("⚠️ Error summarizing file: $e");
-      return null;
-    }
-  }
-
   @override
   void dispose() {
     _studyHubSub?.cancel();
@@ -204,6 +165,7 @@ class HomeController extends ChangeNotifier {
     super.dispose();
   }
 
+  /// Delete file (Cloudinary + Firestore)
   Future<void> deleteFile(
     FileCardModel file,
     BuildContext context,
@@ -230,7 +192,7 @@ class HomeController extends ChangeNotifier {
         }
       }
 
-      // 2️Delete from Firestore
+      // 2️⃣ Delete from Firestore
       await _fileRepository.firestore
           .collection('users')
           .doc(uid)
