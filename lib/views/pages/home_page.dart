@@ -7,6 +7,12 @@ import 'package:easemester_app/views/widgets/study_card.dart';
 import 'package:flutter/material.dart';
 import 'package:easemester_app/views/widgets/cards/achievement_card.dart';
 import 'package:easemester_app/controllers/home_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'file_viewer_page.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:io';
 
 class HomePage extends StatelessWidget {
   final HomeController controller;
@@ -86,15 +92,31 @@ class HomePage extends StatelessWidget {
                           .studyHubCards[index]; // FileCardModel
                       return StudyCard(
                         file: file,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                    FeaturePage(file: file),
-                                  
-                            ),
-                          );
+                        onTap: () async {
+                          if (file.aiFeatures == null || file.aiFeatures!.isEmpty) {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (_) => const Center(child: CircularProgressIndicator()),
+                            );
+                            final newFile = await controller.runExtractionAndAI(file, isStudyHub: true);
+                            Navigator.pop(context); // close dialog
+                            if (newFile != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => FeaturePage(file: newFile),
+                                ),
+                              );
+                            }
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => FeaturePage(file: file),
+                              ),
+                            );
+                          }
                         },
                         onLongPress: () {
                           confirmDeleteFile(
@@ -112,21 +134,77 @@ class HomePage extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     itemCount: controller.filesCards.length,
                     itemBuilder: (context, index) {
-                      final file =
-                          controller.filesCards[index];
+                      final file = controller.filesCards[index];
                       return Padding(
                         padding: const EdgeInsets.only(
                           bottom: 12,
                         ),
                         child: FileCardWidget(
                           fileCard: file,
-                          onTap: () {
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Tapped file: ${file.fileName}',
+                          onTap: () async {
+                            final url = file.fileUrl;
+                            final isTxt = url.toLowerCase().endsWith('.txt');
+
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (_) => SafeArea(
+                                child: Wrap(
+                                  children: [
+                                    if (isTxt)
+                                      ListTile(
+                                        leading: const Icon(Icons.description_outlined),
+                                        title: const Text('View in app (TXT)'),
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => FileViewerPage(
+                                                fileUrl: url,
+                                                fileName: file.fileName,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ListTile(
+                                      leading: const Icon(Icons.open_in_new),
+                                      title: const Text('Open with another app'),
+                                      onTap: () async {
+                                        Navigator.pop(context);
+                                        try {
+                                          // Show a simple loading dialog while downloading
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: false,
+                                            builder: (_) => const Center(child: CircularProgressIndicator()),
+                                          );
+                                          // Download to temp
+                                          final response = await http.get(Uri.parse(url));
+                                          final tempDir = await getTemporaryDirectory();
+                                          final fileName = url.split('/').last.split('?').first;
+                                          final filePath = '${tempDir.path}/$fileName';
+                                          final f = File(filePath);
+                                          await f.writeAsBytes(response.bodyBytes);
+                                          Navigator.pop(context); // close loading dialog
+                                          // Open chooser
+                                          final result = await OpenFilex.open(filePath);
+                                          if (result.type != ResultType.done && context.mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text('Could not open file: ${result.message}')),
+                                            );
+                                          }
+                                        } catch (e) {
+                                          if (context.mounted) {
+                                            Navigator.pop(context); // ensure dialog closed if error
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: Text('Failed to open: $e')),
+                                            );
+                                          }
+                                        }
+                                      },
+                                    ),
+                                  ],
                                 ),
                               ),
                             );

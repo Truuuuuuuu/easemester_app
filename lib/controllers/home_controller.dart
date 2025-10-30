@@ -52,7 +52,7 @@ class HomeController extends ChangeNotifier {
         });
   }
 
-  /// Pick and upload file
+  /// Pick and upload file (metadata only for both StudyHub and Files)
   Future<void> pickAndUploadFile({
     required bool isStudyHub,
   }) async {
@@ -61,104 +61,97 @@ class HomeController extends ChangeNotifier {
         type: FileType.custom,
         allowedExtensions: ['pdf', 'docx', 'txt'],
       );
-
       if (result == null || result.files.isEmpty) return;
       final path = result.files.first.path;
       if (path == null) return;
-
       final file = File(path);
       final uid = FirebaseAuth.instance.currentUser!.uid;
-
-      // 1️⃣ Upload to Cloudinary
-      final uploadResult = await _cloudinaryService
-          .uploadFile(file);
+      // Upload to Cloudinary
+      final uploadResult = await _cloudinaryService.uploadFile(file);
       if (uploadResult == null) return;
-
       final fileUrl = uploadResult['url'];
       final publicId = uploadResult['public_id'];
-
-      // 2️⃣ Create Firestore reference
-      final studyHubDocRef = _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('studyHubFiles')
-          .doc(); // random ID
-
-      final tempFile = FileCardModel(
-        id: studyHubDocRef.id,
+      // Firestore doc (studyHubFiles or files)
+      final docRef = _firestore
+        .collection('users')
+        .doc(uid)
+        .collection(isStudyHub ? 'studyHubFiles' : 'files')
+        .doc();
+      final fileCard = FileCardModel(
+        id: docRef.id,
         fileName: result.files.first.name,
         fileUrl: fileUrl,
         publicId: publicId,
-        description:
-            "Uploaded on ${DateTime.now().toLocal()}",
+        description: "Uploaded on ${DateTime.now().toLocal()}",
       );
-
-      String? extractedText;
-      Map<String, dynamic>? aiFeatures;
-
-      // 3️⃣ Extract text + generate AI content (summary + quiz)
       if (isStudyHub) {
-        extractedText =
-            await FileExtractor.pickAndExtractFromPath(
-              path,
-              fileId: studyHubDocRef.id,
-            );
-
-        if (extractedText != null &&
-            extractedText.isNotEmpty) {
-          final openAIService = OpenAIService();
-
-          print("🧠 Generating summary using OpenAI...");
-          final summary = await openAIService
-              .generateSummary(extractedText);
-
-          print("🚀 Generating short quiz using OpenAI...");
-          final quiz = await openAIService
-              .generateShortQuiz(summary);
-
-          print("📘 Generating flashcards using OpenAI...");
-          final flashcards = await openAIService
-              .generateFlashcards(extractedText);
-
-          aiFeatures = {"summary": summary, "quiz": quiz, "flashcards": flashcards};
-        }
+        await _fileRepository.addStudyHubFile(
+          uid,
+          fileCard,
+          docRef.id,
+        );
+      } else {
+        await _fileRepository.addFilesTabFile(
+          uid,
+          fileCard,
+          docRef.id,
+        );
       }
+      print("✅ Uploaded file with ${isStudyHub ? 'StudyHub' : 'Files'} ID: ${docRef.id}");
+    } catch (e) {
+      print("⚠️ Error uploading file: $e");
+    }
+  }
 
-      // 4️⃣ Save to Firestore
-      final fullFile = tempFile.copyWith(
+  /// Extract and run AI features on a file (Files tab on demand)
+  Future<FileCardModel?> runExtractionAndAI(FileCardModel file, {bool isStudyHub = false}) async {
+    try {
+      final path = file.fileUrl;
+      String? extractedText = await FileExtractor.pickAndExtractFromPath(
+        path,
+        fileId: file.id,
+        isStudyHub: isStudyHub,
+      );
+      if (extractedText == null || extractedText.isEmpty) return null;
+      final openAIService = OpenAIService();
+      final summary = await openAIService.generateSummary(extractedText);
+      final quiz = await openAIService.generateShortQuiz(summary);
+      final flashcards = await openAIService.generateFlashcards(extractedText);
+      final aiFeatures = {
+        "summary": summary,
+        "quiz": quiz,
+        "flashcards": flashcards,
+      };
+      final updatedFile = file.copyWith(
         fileText: extractedText,
         aiFeatures: aiFeatures,
       );
-
-      await _fileRepository.addStudyHubFile(
-        uid,
-        fullFile,
-        studyHubDocRef.id,
-      );
-
-      // 5️⃣ Add to "Files" tab (metadata only)
-      final metadataFile = FileCardModel(
-        id: studyHubDocRef.id,
-        fileName: result.files.first.name,
-        fileUrl: fileUrl,
-        publicId: publicId,
-        description:
-            "Uploaded on ${DateTime.now().toLocal()}",
-        fileText: null,
-        aiFeatures: null,
-      );
-
-      await _fileRepository.addFilesTabFile(
-        uid,
-        metadataFile,
-        metadataFile.id,
-      );
-
-      print(
-        "✅ Uploaded file with StudyHub ID: ${studyHubDocRef.id}",
-      );
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+      if (isStudyHub) {
+        // Only update studyHubFiles collection for StudyHub items
+        await _fileRepository.addStudyHubFile(
+          uid,
+          updatedFile,
+          updatedFile.id,
+        );
+        // Update local state (for reactivity)
+        final index = studyHubCards.indexWhere((f) => f.id == file.id);
+        if (index >= 0) {
+          studyHubCards[index] = updatedFile;
+          notifyListeners();
+        }
+      } else {
+        // Only update the files collection and local state for Files tab, never from StudyHub flow!
+        final index = filesCards.indexWhere((f) => f.id == file.id);
+        if (index >= 0) {
+          filesCards[index] = updatedFile;
+          notifyListeners();
+        }
+      }
+      return updatedFile;
     } catch (e) {
-      print("⚠️ Error uploading file: $e");
+      print("❌ Error running extraction & AI: $e");
+      return null;
     }
   }
 

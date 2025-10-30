@@ -12,11 +12,13 @@ class FileExtractor {
   static Future<String?> pickAndExtractFromPath(
     String filePath, {
     required String fileId,
+    bool isStudyHub = false,
   }) async {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception('No logged-in user');
 
+      final collectionName = isStudyHub ? 'studyHubFiles' : 'files';
       // ✅ Get filename (same key used in Firestore)
       final fileName = filePath.split('/').last;
 
@@ -24,18 +26,15 @@ class FileExtractor {
       final existingDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
-          .collection('files')
+          .collection(collectionName)
           .doc(fileId)
           .get();
 
       if (existingDoc.exists &&
           existingDoc.data() != null &&
           existingDoc.data()!['fileText'] != null &&
-          (existingDoc.data()!['fileText'] as String)
-              .isNotEmpty) {
-        print(
-          "⚡ Using cached extracted text for $fileName",
-        );
+          (existingDoc.data()!['fileText'] as String).isNotEmpty) {
+        print("⚡ Using cached extracted text for $fileName");
         return existingDoc.data()!['fileText'];
       }
 
@@ -45,10 +44,7 @@ class FileExtractor {
       }
 
       // 🔹 Extract text based on file type
-      final extension = filePath
-          .split('.')
-          .last
-          .toLowerCase();
+      final extension = filePath.split('.').last.toLowerCase();
       String text;
 
       switch (extension) {
@@ -66,17 +62,15 @@ class FileExtractor {
           return null;
       }
 
-      // ✅ Cache extracted text back to Firestore
+      // ✅ Cache extracted text back to correct Firestore collection
       await FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
-          .collection('files')
+          .collection(collectionName)
           .doc(fileId)
           .set({'fileText': text}, SetOptions(merge: true));
 
-      print(
-        "💾 Saved extracted text for $fileName to Firestore",
-      );
+      print("💾 Saved extracted text for $fileName to Firestore ($collectionName)");
       return text;
     } catch (e) {
       print("❌ Error extracting file text: $e");
