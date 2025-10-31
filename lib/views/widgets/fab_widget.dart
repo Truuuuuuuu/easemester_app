@@ -33,7 +33,7 @@ class CustomFAB extends StatelessWidget {
           // HomePage FAB
           return _buildFab(() async {
             final tabIndex =
-                homeController.tabController.index;
+                homeController.tabController?.index ?? 0;
 
             if (tabIndex == 0) {
               // Study Hub tab → add file to Study Hub subcollection

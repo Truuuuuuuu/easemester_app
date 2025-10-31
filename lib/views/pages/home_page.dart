@@ -1,13 +1,11 @@
 import 'package:easemester_app/data/constant.dart';
 import 'package:easemester_app/helpers/dialog_helpers.dart';
 import 'package:easemester_app/views/pages/ai%20features/ai_features_page.dart';
-import 'package:easemester_app/views/pages/ai%20features/summary_page.dart';
 import 'package:easemester_app/views/widgets/cards/file_card.dart';
 import 'package:easemester_app/views/widgets/study_card.dart';
 import 'package:flutter/material.dart';
 import 'package:easemester_app/views/widgets/cards/achievement_card.dart';
 import 'package:easemester_app/controllers/home_controller.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'file_viewer_page.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
@@ -92,78 +90,16 @@ class HomePage extends StatelessWidget {
                           .studyHubCards[index]; // FileCardModel
                       return StudyCard(
                         file: file,
-                        onTap: () async {
-                          if (file.aiFeatures == null ||
-                              file.aiFeatures!.isEmpty) {
-                            showDialog(
-                              context: context,
-                              barrierDismissible:
-                                  false, // prevent closing while generating
-                              builder: (_) => Dialog(
-                                backgroundColor:
-                                    const Color.fromARGB(255, 15, 61, 241),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                        16,
-                                      ),
-                                ),
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.all(
-                                        24,
-                                      ),
-                                  child: Column(
-                                    mainAxisSize:
-                                        MainAxisSize.min,
-                                    children: const [
-                                      CircularProgressIndicator(),
-                                      SizedBox(height: 16),
-                                      Text(
-                                        "Please wait — AI is generating your study materials...",
-                                        textAlign: TextAlign
-                                            .center,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-
-                            final newFile = await controller
-                                .runExtractionAndAI(
-                                  file,
-                                  isStudyHub: true,
-                                );
-
-                            Navigator.pop(
-                              context,
-                            ); // close dialog after AI completes
-
-                            if (newFile != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      FeaturePage(
-                                        file: newFile,
-                                      ),
-                                ),
-                              );
-                            }
-                          } else {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    FeaturePage(file: file),
-                              ),
-                            );
-                          }
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  FeaturePage(file: file, isStudyHub: true),
+                            ),
+                          );
                         },
+
                         onLongPress: () {
                           confirmDeleteFile(
                             context,

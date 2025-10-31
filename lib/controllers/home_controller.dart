@@ -11,7 +11,7 @@ import '../services/cloudinary_service.dart';
 import '../services/file_extractor_service.dart';
 
 class HomeController extends ChangeNotifier {
-  final TabController tabController;
+  final TabController? tabController;
 
   List<FileCardModel> studyHubCards = [];
   List<FileCardModel> filesCards = [];
@@ -31,10 +31,17 @@ class HomeController extends ChangeNotifier {
     _initStreams();
   }
 
+  // Lightweight constructor for AI-only operations (no TabController, no streams)
+  HomeController.aiTools() : tabController = null;
+
   int get totalFilesCount =>
       studyHubCards.length + filesCards.length;
 
   void _initStreams() {
+    if (tabController == null) {
+      // Streams are only relevant when a TabController is present
+      return;
+    }
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
     _studyHubSub = _fileRepository

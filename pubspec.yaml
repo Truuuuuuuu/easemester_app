@@ -58,6 +58,7 @@ dependencies:
   path: ^1.9.1
   url_launcher: ^6.3.0
   open_filex: ^4.4.0
+  lottie: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -87,6 +88,7 @@ flutter:
   assets:
     - .env
     - assets/images/
+    - assets/lottie/
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
