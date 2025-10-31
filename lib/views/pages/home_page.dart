@@ -93,19 +93,64 @@ class HomePage extends StatelessWidget {
                       return StudyCard(
                         file: file,
                         onTap: () async {
-                          if (file.aiFeatures == null || file.aiFeatures!.isEmpty) {
+                          if (file.aiFeatures == null ||
+                              file.aiFeatures!.isEmpty) {
                             showDialog(
                               context: context,
-                              barrierDismissible: false,
-                              builder: (_) => const Center(child: CircularProgressIndicator()),
+                              barrierDismissible:
+                                  false, // prevent closing while generating
+                              builder: (_) => Dialog(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 15, 61, 241),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(
+                                        16,
+                                      ),
+                                ),
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.all(
+                                        24,
+                                      ),
+                                  child: Column(
+                                    mainAxisSize:
+                                        MainAxisSize.min,
+                                    children: const [
+                                      CircularProgressIndicator(),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        "Please wait — AI is generating your study materials...",
+                                        textAlign: TextAlign
+                                            .center,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             );
-                            final newFile = await controller.runExtractionAndAI(file, isStudyHub: true);
-                            Navigator.pop(context); // close dialog
+
+                            final newFile = await controller
+                                .runExtractionAndAI(
+                                  file,
+                                  isStudyHub: true,
+                                );
+
+                            Navigator.pop(
+                              context,
+                            ); // close dialog after AI completes
+
                             if (newFile != null) {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => FeaturePage(file: newFile),
+                                  builder: (_) =>
+                                      FeaturePage(
+                                        file: newFile,
+                                      ),
                                 ),
                               );
                             }
@@ -113,7 +158,8 @@ class HomePage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => FeaturePage(file: file),
+                                builder: (_) =>
+                                    FeaturePage(file: file),
                               ),
                             );
                           }
@@ -134,7 +180,8 @@ class HomePage extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     itemCount: controller.filesCards.length,
                     itemBuilder: (context, index) {
-                      final file = controller.filesCards[index];
+                      final file =
+                          controller.filesCards[index];
                       return Padding(
                         padding: const EdgeInsets.only(
                           bottom: 12,
@@ -143,7 +190,9 @@ class HomePage extends StatelessWidget {
                           fileCard: file,
                           onTap: () async {
                             final url = file.fileUrl;
-                            final isTxt = url.toLowerCase().endsWith('.txt');
+                            final isTxt = url
+                                .toLowerCase()
+                                .endsWith('.txt');
 
                             showModalBottomSheet(
                               context: context,
@@ -152,53 +201,120 @@ class HomePage extends StatelessWidget {
                                   children: [
                                     if (isTxt)
                                       ListTile(
-                                        leading: const Icon(Icons.description_outlined),
-                                        title: const Text('View in app (TXT)'),
+                                        leading: const Icon(
+                                          Icons
+                                              .description_outlined,
+                                        ),
+                                        title: const Text(
+                                          'View in app (TXT)',
+                                        ),
                                         onTap: () {
-                                          Navigator.pop(context);
+                                          Navigator.pop(
+                                            context,
+                                          );
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (_) => FileViewerPage(
-                                                fileUrl: url,
-                                                fileName: file.fileName,
-                                              ),
+                                              builder: (_) =>
+                                                  FileViewerPage(
+                                                    fileUrl:
+                                                        url,
+                                                    fileName:
+                                                        file.fileName,
+                                                  ),
                                             ),
                                           );
                                         },
                                       ),
                                     ListTile(
-                                      leading: const Icon(Icons.open_in_new),
-                                      title: const Text('Open with another app'),
+                                      leading: const Icon(
+                                        Icons.open_in_new,
+                                      ),
+                                      title: const Text(
+                                        'Open with another app',
+                                      ),
                                       onTap: () async {
-                                        Navigator.pop(context);
+                                        Navigator.pop(
+                                          context,
+                                        );
                                         try {
                                           // Show a simple loading dialog while downloading
                                           showDialog(
-                                            context: context,
-                                            barrierDismissible: false,
-                                            builder: (_) => const Center(child: CircularProgressIndicator()),
+                                            context:
+                                                context,
+                                            barrierDismissible:
+                                                false,
+                                            builder: (_) =>
+                                                const Center(
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                ),
                                           );
                                           // Download to temp
-                                          final response = await http.get(Uri.parse(url));
-                                          final tempDir = await getTemporaryDirectory();
-                                          final fileName = url.split('/').last.split('?').first;
-                                          final filePath = '${tempDir.path}/$fileName';
-                                          final f = File(filePath);
-                                          await f.writeAsBytes(response.bodyBytes);
-                                          Navigator.pop(context); // close loading dialog
+                                          final response =
+                                              await http.get(
+                                                Uri.parse(
+                                                  url,
+                                                ),
+                                              );
+                                          final tempDir =
+                                              await getTemporaryDirectory();
+                                          final fileName =
+                                              url
+                                                  .split(
+                                                    '/',
+                                                  )
+                                                  .last
+                                                  .split(
+                                                    '?',
+                                                  )
+                                                  .first;
+                                          final filePath =
+                                              '${tempDir.path}/$fileName';
+                                          final f = File(
+                                            filePath,
+                                          );
+                                          await f.writeAsBytes(
+                                            response
+                                                .bodyBytes,
+                                          );
+                                          Navigator.pop(
+                                            context,
+                                          ); // close loading dialog
                                           // Open chooser
-                                          final result = await OpenFilex.open(filePath);
-                                          if (result.type != ResultType.done && context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(content: Text('Could not open file: ${result.message}')),
+                                          final result =
+                                              await OpenFilex.open(
+                                                filePath,
+                                              );
+                                          if (result.type !=
+                                                  ResultType
+                                                      .done &&
+                                              context
+                                                  .mounted) {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  'Could not open file: ${result.message}',
+                                                ),
+                                              ),
                                             );
                                           }
                                         } catch (e) {
-                                          if (context.mounted) {
-                                            Navigator.pop(context); // ensure dialog closed if error
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(content: Text('Failed to open: $e')),
+                                          if (context
+                                              .mounted) {
+                                            Navigator.pop(
+                                              context,
+                                            ); // ensure dialog closed if error
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  'Failed to open: $e',
+                                                ),
+                                              ),
                                             );
                                           }
                                         }

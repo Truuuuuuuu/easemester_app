@@ -1,11 +1,12 @@
 import 'package:easemester_app/models/file_card_model.dart';
 import 'package:easemester_app/views/pages/ai%20features/flash_card_page.dart';
 import 'package:easemester_app/views/pages/ai%20features/short_quiz_page.dart';
+import 'package:easemester_app/views/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'summary_page.dart';
 
 class FeaturePage extends StatelessWidget {
-  final FileCardModel file; 
+  final FileCardModel file;
 
   const FeaturePage({super.key, required this.file});
 
@@ -14,18 +15,21 @@ class FeaturePage extends StatelessWidget {
     final features = [
       {
         'title': 'Summarize',
-        'icon': Icons.text_snippet_outlined,
+        'imageIcon': 'assets/images/summarize.png',
         'route': SummaryPage(file: file),
+        'image': 'assets/images/summary_card.png',
       },
       {
         'title': 'Flash Cards',
-        'icon': Icons.style_outlined,
+        'imageIcon': 'assets/images/flash_card.png',
         'route': FlashCardPage(file: file),
+        'image': 'assets/images/flashcard_card.png',
       },
       {
         'title': 'Short Quiz',
-        'icon': Icons.quiz_outlined,
+        'imageIcon': 'assets/images/quiz.png',
         'route': ShortQuizPage(file: file),
+        'image': 'assets/images/quiz_card.png',
       },
     ];
 
@@ -33,26 +37,61 @@ class FeaturePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('AI Study Tools'),
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+          ), 
+          onPressed: () {
+            Navigator.of(context).pop(); 
+          },
+        ),
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu),
+              iconSize: 40,
+              onPressed: () =>
+                  Scaffold.of(context).openEndDrawer(),
+            ),
+          ),
+        ],
       ),
+      endDrawer: const AppDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
-          children: features
-              .map(
-                (feature) => Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        16,
-                      ),
+          children: features.map((feature) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 6,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    // Background image
+                    Image.asset(
+                      feature['image'] as String,
+                      fit: BoxFit.cover,
                     ),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(
-                        16,
-                      ),
+
+                    // Dark overlay for readability
+                    Container(
+                      color: Colors.black.withOpacity(0.3),
+                    ),
+
+                    // Foreground content with InkWell
+                    InkWell(
                       onTap: () {
                         Navigator.push(
                           context,
@@ -74,20 +113,21 @@ class FeaturePage extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Icon(
-                                  feature['icon']
-                                      as IconData,
-                                  size: 32,
-                                  color: Colors.blue,
+                                Image.asset(
+                                  feature['imageIcon']
+                                      as String,
+                                  width: 80,
+                                  height: 80,
                                 ),
-                                const SizedBox(width: 16),
+                                const SizedBox(width: 7),
                                 Text(
                                   feature['title']
                                       as String,
                                   style: const TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 30,
                                     fontWeight:
-                                        FontWeight.w600,
+                                        FontWeight.w700,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ],
@@ -95,15 +135,17 @@ class FeaturePage extends StatelessWidget {
                             const Icon(
                               Icons.arrow_forward_ios,
                               size: 18,
+                              color: Colors.white70,
                             ),
                           ],
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              )
-              .toList(),
+              ),
+            );
+          }).toList(),
         ),
       ),
     );
