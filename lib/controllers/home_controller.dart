@@ -213,11 +213,7 @@ class HomeController extends ChangeNotifier {
 
       print("✅ Firestore file deleted: ${file.fileName}");
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("File deleted successfully"),
-        ),
-      );
+     
 
       // 3️⃣ Update local state
       filesCards.removeWhere((f) => f.id == file.id);

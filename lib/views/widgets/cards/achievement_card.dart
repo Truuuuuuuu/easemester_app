@@ -54,14 +54,16 @@ class AchievementItem extends StatelessWidget {
           style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           title,
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(fontSize: 10),
+          style: const TextStyle(
+            fontSize: 10,
+            color: Colors.white, 
+          ),
           textAlign: TextAlign.center,
         ),
       ],

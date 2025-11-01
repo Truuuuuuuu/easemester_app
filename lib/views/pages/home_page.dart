@@ -28,6 +28,7 @@ class HomePage extends StatelessWidget {
             Container(
               margin: const EdgeInsets.all(12),
               child: Card(
+                color: Color.fromARGB(255, 9, 35, 64), 
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
