@@ -14,9 +14,41 @@ class CustomAppBar extends StatelessWidget
     return ValueListenableBuilder<int>(
       valueListenable: selectedPageNotifier,
       builder: (context, selectedPage, child) {
-        if (selectedPage == 3)
-          return const SizedBox.shrink();
-
+        // if (selectedPage == 3)
+        //   return const SizedBox.shrink();
+        if (selectedPage == 3) {
+          return SafeArea(
+            child: Container(
+              color: Colors.transparent,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 18.0,
+              ),
+              child: Row(
+                crossAxisAlignment:
+                    CrossAxisAlignment.center,
+                children: [
+                  const Spacer(),
+                  Builder(
+                    builder: (context) {
+                      return IconButton(
+                        icon: const Icon(Icons.menu),
+                        color: Theme.of(
+                          context,
+                        ).iconTheme.color,
+                        iconSize: 40,
+                        onPressed: () {
+                          Scaffold.of(
+                            context,
+                          ).openEndDrawer();
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
         return SafeArea(
           child: Container(
             padding: const EdgeInsets.symmetric(

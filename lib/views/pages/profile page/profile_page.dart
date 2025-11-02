@@ -6,6 +6,7 @@ import 'package:easemester_app/routes/navigation_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easemester_app/views/widgets/app_drawer.dart';
+import 'package:easemester_app/data/constant.dart'; // ✅ For AppFonts
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -22,7 +23,6 @@ class _ProfilePageState extends State<ProfilePage> {
   UserModel? user;
   bool isLoading = true;
 
-  // Additional info fields
   String college = '';
   String course = '';
   String address = '';
@@ -65,167 +65,302 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  //signout
   Future<void> _signOut() async {
     final confirm = await confirmSignOut(context);
     if (confirm == true) {
       await _auth.signOut();
-
       currentUserNotifier.value = null;
-
-      if (mounted) {
-        NavigationHelper.goToLogin(context);
-      }
+      if (mounted) NavigationHelper.goToLogin(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 100,
-        centerTitle: true,
-        actions: [
-          Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu),
-              iconSize: 40,
-              onPressed: () =>
-                  Scaffold.of(context).openEndDrawer(),
-            ),
-          ),
-        ],
-      ),
       endDrawer: const AppDrawer(),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.center,
-                children: [
-                  // Profile image
-                  CircleAvatar(
-                    radius: 60,
-                    backgroundImage:
-                        user != null &&
-                            user!.profileImageUrl.isNotEmpty
-                        ? NetworkImage(
-                            user!.profileImageUrl,
-                          )
-                        : const AssetImage(
-                                'assets/images/default_profile.png',
-                              )
-                              as ImageProvider,
-                    backgroundColor: Colors.grey[200],
-                  ),
-                  const SizedBox(height: 16),
-                  // Name
-                  Text(
-                    user?.name ?? '',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge
-                        ?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
 
-                  const SizedBox(height: 4),
-                  // Email
-                  Text(
-                    user?.email ?? '',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
+      body: SafeArea(
+        child: Container(
+          // Removed gradient from body since it's now in the AppBar
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(
+                    24.0,
+                    24.0,
+                    24.0,
+                    24.0,
                   ),
-                  const SizedBox(height: 12),
-                  // Edit button
-                  ElevatedButton(
-                    onPressed: user == null
-                        ? null
-                        : () async {
-                            final updated =
-                                await NavigationHelper.goToEditProfile(
-                                  context,
-                                  user!,
-                                );
-                            if (updated == true) {
-                              _fetchUserData();
-                            }
-                          },
-                    child: const Text('Edit Profile'),
-                  ),
-                  const SizedBox(height: 32),
-                  // Additional info list
-                  Column(
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.center,
                     children: [
-                      ListTile(
-                        leading: const Icon(Icons.school),
-                        title: const Text(
-                          "College/University",
+                      // Profile header
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 32,
                         ),
-                        subtitle: Text(
-                          college.isNotEmpty
-                              ? college
-                              : "Not set",
+                        child: Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary,
+                                  width: 4,
+                                ),
+                              ),
+                              child: CircleAvatar(
+                                radius: 70,
+                                backgroundImage:
+                                    user != null &&
+                                        user!
+                                            .profileImageUrl
+                                            .isNotEmpty
+                                    ? NetworkImage(
+                                        user!
+                                            .profileImageUrl,
+                                      )
+                                    : const AssetImage(
+                                            'assets/images/default_profile.png',
+                                          )
+                                          as ImageProvider,
+                                backgroundColor:
+                                    Colors.grey[200],
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              user?.name ?? 'No Name',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
+                                    fontWeight:
+                                        FontWeight.bold,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
+                            ),
+                            //const SizedBox(height: 1),
+                            Text(
+                              user?.email ?? 'No Email',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withOpacity(0.7),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                // Smaller Edit Button
+                                ElevatedButton.icon(
+                                  icon: const Icon(
+                                    Icons.edit,
+                                  ),
+                                  label: const Text('Edit'),
+                                  onPressed: () async {
+                                    final updated =
+                                        await NavigationHelper.goToEditProfile(
+                                          context,
+                                          user!,
+                                        );
+                                    if (updated == true)
+                                      _fetchUserData();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context)
+                                            .colorScheme
+                                            .secondaryContainer,
+                                    foregroundColor:
+                                        Theme.of(context)
+                                            .colorScheme
+                                            .onSecondaryContainer,
+                                    padding:
+                                        const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 10,
+                                        ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(
+                                            10,
+                                          ),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(width: 12),
+
+                                // Wider Photo Button
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    icon: const Icon(
+                                      Icons.emoji_events,
+                                    ),
+                                    label: const Text(
+                                      'Achievements',
+                                    ),
+                                    onPressed: () {
+                                      // achievement page
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                      foregroundColor:
+                                          Colors.white,
+                                      padding:
+                                          const EdgeInsets.symmetric(
+                                            vertical: 10,
+                                          ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(
+                                              10,
+                                            ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      ListTile(
-                        leading: const Icon(
-                          Icons.menu_book,
-                        ),
-                        title: const Text("Course"),
-                        subtitle: Text(
-                          course.isNotEmpty
-                              ? course
-                              : "Not set",
-                        ),
-                      ),
-                      ListTile(
-                        leading: const Icon(
-                          Icons.location_on,
-                        ),
-                        title: const Text("Address"),
-                        subtitle: Text(
-                          address.isNotEmpty
-                              ? address
-                              : "Not set",
+
+                      // Additional Info Section
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Details',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
+                              ),
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      _buildInfoTile(
+                        icon: Icons.school,
+                        title: "College/University",
+                        subtitle: college.isNotEmpty
+                            ? college
+                            : "Not set",
+                      ),
+                      const Divider(
+                        height: 24,
+                        thickness: 1,
+                      ),
+                      _buildInfoTile(
+                        icon: Icons.menu_book,
+                        title: "Course",
+                        subtitle: course.isNotEmpty
+                            ? course
+                            : "Not set",
+                      ),
+                      const Divider(
+                        height: 24,
+                        thickness: 1,
+                      ),
+                      _buildInfoTile(
+                        icon: Icons.location_on,
+                        title: "Address",
+                        subtitle: address.isNotEmpty
+                            ? address
+                            : "Not set",
+                      ),
+                      const SizedBox(height: 40),
+
+                      // Sign Out Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.logout),
+                          label: const Text('Sign Out'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Colors.red[500],
+                            foregroundColor: Colors.white,
+                            padding:
+                                const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: _signOut,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                     ],
                   ),
-                  const SizedBox(height: 40),
-                  // Sign Out button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      icon: const Icon(
-                        Icons.logout,
-                        color: Colors.white,
-                      ),
-                      label: const Text(
-                        'Sign Out',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red[500],
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                        ),
-                      ),
-                      onPressed: _signOut,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                ],
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    return Row(
+      children: [
+        CircleAvatar(
+          backgroundColor: Theme.of(
+            context,
+          ).colorScheme.primary.withOpacity(0.1),
+          child: Icon(
+            icon,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface,
+                ),
               ),
-            ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
