@@ -8,7 +8,8 @@ class ShortQuizPage extends StatefulWidget {
   const ShortQuizPage({super.key, required this.file});
 
   @override
-  State<ShortQuizPage> createState() => _ShortQuizPageState();
+  State<ShortQuizPage> createState() =>
+      _ShortQuizPageState();
 }
 
 class _ShortQuizPageState extends State<ShortQuizPage> {
@@ -21,14 +22,36 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
     if (quizList == null || quizList.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(
-            widget.file.fileName,
-            style: AppFonts.heading3,
-          ),
           centerTitle: true,
           elevation: 0,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          backgroundColor: Theme.of(
+            context,
+          ).colorScheme.primary,
+          foregroundColor: Theme.of(
+            context,
+          ).colorScheme.onPrimary,
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Short Quiz',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                widget.file.fileName,
+                style: AppFonts.paragraph.copyWith(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onPrimary.withOpacity(0.9),
+                  fontSize: 14,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.info_outline),
@@ -42,7 +65,8 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
                     ),
                     actions: [
                       TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () =>
+                            Navigator.of(context).pop(),
                         child: const Text('Got it'),
                       ),
                     ],
@@ -58,7 +82,9 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                Theme.of(
+                  context,
+                ).colorScheme.primary.withOpacity(0.1),
                 Theme.of(context).colorScheme.surface,
               ],
             ),
@@ -67,11 +93,18 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.quiz, size: 64, color: Colors.grey),
+                Icon(
+                  Icons.quiz,
+                  size: 64,
+                  color: Colors.grey,
+                ),
                 SizedBox(height: 16),
                 Text(
                   'No quiz available.',
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.grey,
+                  ),
                 ),
               ],
             ),
@@ -82,14 +115,36 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.file.fileName,
-          style: AppFonts.heading3,
-        ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.primary,
+        foregroundColor: Theme.of(
+          context,
+        ).colorScheme.onPrimary,
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Short Quiz',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              widget.file.fileName,
+              style: AppFonts.paragraph.copyWith(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onPrimary.withOpacity(0.9),
+                fontSize: 14,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
@@ -103,7 +158,8 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
                   ),
                   actions: [
                     TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () =>
+                          Navigator.of(context).pop(),
                       child: const Text('Got it'),
                     ),
                   ],
@@ -119,7 +175,9 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              Theme.of(
+                context,
+              ).colorScheme.primary.withOpacity(0.1),
               Theme.of(context).colorScheme.surface,
             ],
           ),
@@ -129,95 +187,147 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Short Quiz",
-                style: AppFonts.heading2.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: 16),
+              
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
-                      ...List.generate(quizList.length, (index) {
+                      ...List.generate(quizList.length, (
+                        index,
+                      ) {
                         final item = quizList[index];
                         return AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
+                          duration: const Duration(
+                            milliseconds: 300,
+                          ),
                           curve: Curves.easeInOut,
-                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          margin:
+                              const EdgeInsets.symmetric(
+                                vertical: 8,
+                              ),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.surface,
+                            borderRadius:
+                                BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black
+                                    .withOpacity(0.1),
                                 blurRadius: 10,
                                 offset: const Offset(0, 5),
                               ),
                             ],
                             border: Border.all(
-                              color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .outline
+                                  .withOpacity(0.3),
                               width: 1,
                             ),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(
+                              16,
+                            ),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   children: [
                                     CircleAvatar(
-                                      backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                      backgroundColor:
+                                          Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                              .withOpacity(
+                                                0.1,
+                                              ),
                                       child: Text(
                                         '${index + 1}',
                                         style: TextStyle(
-                                          color: Theme.of(context).colorScheme.primary,
-                                          fontWeight: FontWeight.bold,
+                                          color:
+                                              Theme.of(
+                                                    context,
+                                                  )
+                                                  .colorScheme
+                                                  .primary,
+                                          fontWeight:
+                                              FontWeight
+                                                  .bold,
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
+                                    const SizedBox(
+                                      width: 12,
+                                    ),
                                     Expanded(
                                       child: Text(
                                         'Q${index + 1}: ${item['question']}',
-                                        style: AppFonts.heading3.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context).colorScheme.onSurface,
-                                        ),
+                                        style: AppFonts
+                                            .heading3
+                                            .copyWith(
+                                              fontWeight:
+                                                  FontWeight
+                                                      .bold,
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                            ),
                                       ),
                                     ),
                                   ],
                                 ),
                                 if (_showAnswers) ...[
-                                  const SizedBox(height: 12),
+                                  const SizedBox(
+                                    height: 12,
+                                  ),
                                   Container(
-                                    padding: const EdgeInsets.all(12),
+                                    padding:
+                                        const EdgeInsets.all(
+                                          12,
+                                        ),
                                     decoration: BoxDecoration(
-                                      color: Colors.green[50],
-                                      borderRadius: BorderRadius.circular(8),
+                                      color:
+                                          Colors.green[50],
+                                      borderRadius:
+                                          BorderRadius.circular(
+                                            8,
+                                          ),
                                       border: Border.all(
-                                        color: Colors.green[200]!,
+                                        color: Colors
+                                            .green[200]!,
                                         width: 1,
                                       ),
                                     ),
                                     child: Row(
                                       children: [
                                         Icon(
-                                          Icons.check_circle,
-                                          color: Colors.green[700],
+                                          Icons
+                                              .check_circle,
+                                          color: Colors
+                                              .green[700],
                                           size: 20,
                                         ),
-                                        const SizedBox(width: 8),
+                                        const SizedBox(
+                                          width: 8,
+                                        ),
                                         Expanded(
                                           child: Text(
                                             'Answer: ${item['answer']}',
-                                            style: AppFonts.paragraph.copyWith(
-                                              color: Colors.green[700],
-                                              fontWeight: FontWeight.w500,
-                                            ),
+                                            style: AppFonts
+                                                .paragraph
+                                                .copyWith(
+                                                  color: Colors
+                                                      .green[700],
+                                                  fontWeight:
+                                                      FontWeight
+                                                          .w500,
+                                                ),
                                           ),
                                         ),
                                       ],
@@ -243,18 +353,30 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
                     });
                   },
                   icon: Icon(
-                    _showAnswers ? Icons.visibility_off : Icons.visibility,
+                    _showAnswers
+                        ? Icons.visibility_off
+                        : Icons.visibility,
                   ),
                   label: Text(
-                    _showAnswers ? 'Hide All Answers' : 'Show All Answers',
+                    _showAnswers
+                        ? 'Hide All Answers'
+                        : 'Show All Answers',
                   ),
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
                     ),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        12,
+                      ),
+                    ),
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primary,
+                    foregroundColor: Theme.of(
+                      context,
+                    ).colorScheme.onPrimary,
                   ),
                 ),
               ),

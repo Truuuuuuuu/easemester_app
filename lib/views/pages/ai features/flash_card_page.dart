@@ -1,3 +1,4 @@
+import 'package:easemester_app/data/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:easemester_app/models/file_card_model.dart';
 import 'dart:math' as math;
@@ -8,7 +9,8 @@ class FlashCardPage extends StatefulWidget {
   const FlashCardPage({super.key, required this.file});
 
   @override
-  State<FlashCardPage> createState() => _FlashcardsPageState();
+  State<FlashCardPage> createState() =>
+      _FlashcardsPageState();
 }
 
 class _FlashcardsPageState extends State<FlashCardPage>
@@ -31,7 +33,8 @@ class _FlashcardsPageState extends State<FlashCardPage>
           .map(
             (e) => {
               "term": e["term"]?.toString() ?? "",
-              "definition": e["definition"]?.toString() ?? "",
+              "definition":
+                  e["definition"]?.toString() ?? "",
             },
           )
           .toList();
@@ -44,9 +47,13 @@ class _FlashcardsPageState extends State<FlashCardPage>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    _flipAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _flipController, curve: Curves.easeInOut),
-    );
+    _flipAnimation = Tween<double>(begin: 0, end: 1)
+        .animate(
+          CurvedAnimation(
+            parent: _flipController,
+            curve: Curves.easeInOut,
+          ),
+        );
   }
 
   @override
@@ -87,14 +94,19 @@ class _FlashcardsPageState extends State<FlashCardPage>
     });
   }
 
-  Widget _buildCard(bool isFront, Map<String, String> currentCard) {
+  Widget _buildCard(
+    bool isFront,
+    Map<String, String> currentCard,
+  ) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
       height: MediaQuery.of(context).size.height * 0.4,
       decoration: BoxDecoration(
         color: isFront
             ? Theme.of(context).colorScheme.surface
-            : Theme.of(context).colorScheme.secondaryContainer,
+            : Theme.of(
+                context,
+              ).colorScheme.secondaryContainer,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -104,7 +116,9 @@ class _FlashcardsPageState extends State<FlashCardPage>
           ),
         ],
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+          color: Theme.of(
+            context,
+          ).colorScheme.outline.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -119,10 +133,14 @@ class _FlashcardsPageState extends State<FlashCardPage>
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: isFront ? 24 : 20,
-              fontWeight: isFront ? FontWeight.bold : FontWeight.normal,
+              fontWeight: isFront
+                  ? FontWeight.bold
+                  : FontWeight.normal,
               color: isFront
                   ? Theme.of(context).colorScheme.onSurface
-                  : Theme.of(context).colorScheme.onSecondaryContainer,
+                  : Theme.of(
+                      context,
+                    ).colorScheme.onSecondaryContainer,
             ),
           ),
         ),
@@ -135,21 +153,35 @@ class _FlashcardsPageState extends State<FlashCardPage>
     if (_flashcards.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Flashcards'),
+          title: Text(
+            widget.file.fileName,
+            style: AppFonts.heading3,
+          ),
           centerTitle: true,
           elevation: 0,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          backgroundColor: Theme.of(
+            context,
+          ).colorScheme.primary,
+          foregroundColor: Theme.of(
+            context,
+          ).colorScheme.onPrimary,
         ),
         body: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.library_books, size: 64, color: Colors.grey),
+              Icon(
+                Icons.library_books,
+                size: 64,
+                color: Colors.grey,
+              ),
               SizedBox(height: 16),
               Text(
                 'No flashcards available.',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey,
+                ),
               ),
             ],
           ),
@@ -161,11 +193,36 @@ class _FlashcardsPageState extends State<FlashCardPage>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flashcards'),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.primary,
+        foregroundColor: Theme.of(
+          context,
+        ).colorScheme.onPrimary,
+        title: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Flashcards',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              widget.file.fileName,
+              style: AppFonts.paragraph.copyWith(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onPrimary.withOpacity(0.9),
+                fontSize: 14,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
@@ -179,7 +236,8 @@ class _FlashcardsPageState extends State<FlashCardPage>
                   ),
                   actions: [
                     TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () =>
+                          Navigator.of(context).pop(),
                       child: const Text('Got it'),
                     ),
                   ],
@@ -189,13 +247,16 @@ class _FlashcardsPageState extends State<FlashCardPage>
           ),
         ],
       ),
+
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              Theme.of(
+                context,
+              ).colorScheme.primary.withOpacity(0.1),
               Theme.of(context).colorScheme.surface,
             ],
           ),
@@ -214,7 +275,8 @@ class _FlashcardsPageState extends State<FlashCardPage>
               animation: _flipAnimation,
               builder: (context, child) {
                 final isFront = _flipAnimation.value < 0.5;
-                final rotationY = _flipAnimation.value * math.pi;
+                final rotationY =
+                    _flipAnimation.value * math.pi;
 
                 return Transform(
                   transform: Matrix4.identity()
@@ -225,8 +287,13 @@ class _FlashcardsPageState extends State<FlashCardPage>
                       ? _buildCard(true, currentCard)
                       : Transform(
                           alignment: Alignment.center,
-                          transform: Matrix4.rotationY(math.pi),
-                          child: _buildCard(false, currentCard),
+                          transform: Matrix4.rotationY(
+                            math.pi,
+                          ),
+                          child: _buildCard(
+                            false,
+                            currentCard,
+                          ),
                         ),
                 );
               },
@@ -235,7 +302,10 @@ class _FlashcardsPageState extends State<FlashCardPage>
         ),
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        padding: const EdgeInsets.symmetric(
+          vertical: 16,
+          horizontal: 24,
+        ),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           boxShadow: [
@@ -250,7 +320,9 @@ class _FlashcardsPageState extends State<FlashCardPage>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              onPressed: _currentIndex > 0 ? _previousCard : null,
+              onPressed: _currentIndex > 0
+                  ? _previousCard
+                  : null,
               icon: Icon(
                 Icons.arrow_back_ios,
                 color: _currentIndex > 0
@@ -263,11 +335,16 @@ class _FlashcardsPageState extends State<FlashCardPage>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   LinearProgressIndicator(
-                    value: (_currentIndex + 1) / _flashcards.length,
+                    value:
+                        (_currentIndex + 1) /
+                        _flashcards.length,
                     backgroundColor: Colors.grey[300],
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Theme.of(context).colorScheme.primary,
-                    ),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(
+                          Theme.of(
+                            context,
+                          ).colorScheme.primary,
+                        ),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -275,7 +352,9 @@ class _FlashcardsPageState extends State<FlashCardPage>
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -283,10 +362,13 @@ class _FlashcardsPageState extends State<FlashCardPage>
             ),
             IconButton(
               onPressed:
-                  _currentIndex < _flashcards.length - 1 ? _nextCard : null,
+                  _currentIndex < _flashcards.length - 1
+                  ? _nextCard
+                  : null,
               icon: Icon(
                 Icons.arrow_forward_ios,
-                color: _currentIndex < _flashcards.length - 1
+                color:
+                    _currentIndex < _flashcards.length - 1
                     ? Theme.of(context).colorScheme.primary
                     : Colors.grey,
               ),
