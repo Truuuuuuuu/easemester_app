@@ -173,8 +173,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                           context,
                                           user!,
                                         );
-                                    if (updated == true)
+                                    if (updated == true) {
                                       _fetchUserData();
+                                    }
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor:

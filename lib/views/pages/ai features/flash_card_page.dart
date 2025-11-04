@@ -128,8 +128,8 @@ class _FlashcardsPageState extends State<FlashCardPage>
           // ✅ FIXED: Removed extra Transform to prevent mirrored text
           child: Text(
             isFront
-                ? (currentCard["term"] ?? "")
-                : (currentCard["definition"] ?? ""),
+                ? (currentCard["definition"] ?? "")
+                : (currentCard["term"] ?? ""),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: isFront ? 24 : 20,
