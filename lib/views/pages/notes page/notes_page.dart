@@ -29,7 +29,7 @@ class NotesPageState extends State<NotesPage> {
             controller.selectionMode &&
             controller.selectedNotes.isNotEmpty;
 
-        // ✅ FIXED: Removed inner Scaffold to prevent keyboard overlap
+        // no Scaffold to prevent keyboard overlap
         return SafeArea(
           child: Column(
             children: [

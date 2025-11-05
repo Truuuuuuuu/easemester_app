@@ -27,8 +27,7 @@ class ChecklistPageState extends State<ChecklistPage> {
 
   /// Called from FAB to add a new checklist item
   Future<void> addChecklistCardDialog() async {
-    final TextEditingController dialogController =
-        TextEditingController();
+    final dialogController = TextEditingController();
 
     final result = await showDialog<String>(
       context: context,
@@ -66,8 +65,13 @@ class ChecklistPageState extends State<ChecklistPage> {
     final controllerText =
         _editingControllers[id]?.text ?? "";
     if (controllerText.trim().isEmpty) {
-      // Optional: delete empty items automatically
-      controller.deleteItem(id);
+      await controller.deleteItem(id);
+
+      // Exit selection mode if item deleted
+      setState(() {
+        controller.clearSelection();
+        _editingItemId = null;
+      });
     } else {
       final item = controller.items.firstWhere(
         (element) => element.id == id,
@@ -80,10 +84,11 @@ class ChecklistPageState extends State<ChecklistPage> {
         controller.uid,
         updatedItem,
       );
+
+      setState(() {
+        _editingItemId = null;
+      });
     }
-    setState(() {
-      _editingItemId = null;
-    });
   }
 
   @override
@@ -96,73 +101,65 @@ class ChecklistPageState extends State<ChecklistPage> {
 
   @override
   Widget build(BuildContext context) {
-    final hasSelection =
-        controller.selectionMode &&
-        controller.selectedTasks.isNotEmpty;
-
     return Column(
       children: [
-        // Top label or selection bar
-        hasSelection
-            ? Container(
-                color:
-                    Theme.of(context).brightness ==
-                        Brightness.light
-                    ? Colors.grey[200] // light mode
-                    : Colors.grey[800], // dark mode
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+        // Top label + selection info
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Text("Checklist", style: AppFonts.title),
+          ),
+        ),
+
+        //selection mode info (only visible when selectionMode active)
+        if (controller.selectionMode &&
+            controller.selectedTasks.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 8,
+            ),
+            child: Row(
+              mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${controller.selectedTasks.length} selected',
                 ),
-                child: Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
+                Row(
                   children: [
-                    Text(
-                      '${controller.selectedTasks.length} selected',
+                    IconButton(
+                      icon: FaIcon(
+                        FontAwesomeIcons.trashCan,
+                        color: Colors.red,
+                      ),
+                      onPressed: () async {
+                        await confirmDeleteTasks(
+                          context,
+                          controller,
+                        );
+                        setState(() {
+                          controller.clearSelection();
+                        });
+                      },
                     ),
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: FaIcon(
-                            FontAwesomeIcons.trashCan,
-                            color: Colors.red,
-                          ),
-                          onPressed: () =>
-                              confirmDeleteTasks(
-                                context,
-                                controller,
-                              ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () {
-                            setState(() {
-                              controller.selectionMode =
-                                  false;
-                              controller.selectedTasks
-                                  .clear();
-                            });
-                          },
-                        ),
-                      ],
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        setState(() {
+                          controller.clearSelection();
+                        });
+                      },
                     ),
                   ],
                 ),
-              )
-            : Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    "Checklist",
-                    style: AppFonts.title,
-                  ),
-                ),
-              ),
+              ],
+            ),
+          ),
 
         // Checklist items
         Expanded(
@@ -170,7 +167,17 @@ class ChecklistPageState extends State<ChecklistPage> {
             animation: controller,
             builder: (context, _) {
               final items = controller.items;
+
               if (items.isEmpty) {
+                // Auto exit selection mode if no items
+                if (controller.selectionMode) {
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) {
+                        setState(() {
+                          controller.selectionMode = false;
+                        });
+                      });
+                }
                 return const Center(
                   child: Text("No checklist items yet"),
                 );
@@ -205,8 +212,11 @@ class ChecklistPageState extends State<ChecklistPage> {
                     isEditing: isEditing,
                     onEditingComplete: () =>
                         _saveItem(item.id),
-                    onChanged: (_) =>
-                        controller.toggleCompleted(item),
+                    onChanged: controller.selectionMode
+                        ? (_) {}
+                        : (_) => controller.toggleCompleted(
+                            item,
+                          ),
                     onTap: () {
                       if (controller.selectionMode) {
                         setState(() {
@@ -214,16 +224,16 @@ class ChecklistPageState extends State<ChecklistPage> {
                             controller.selectedTasks.remove(
                               item.id,
                             );
-                            if (controller
-                                .selectedTasks
-                                .isEmpty) {
-                              controller.selectionMode =
-                                  false;
-                            }
                           } else {
                             controller.selectedTasks.add(
                               item.id,
                             );
+                          }
+                          if (controller
+                              .selectedTasks
+                              .isEmpty) {
+                            controller.selectionMode =
+                                false;
                           }
                         });
                       } else {
@@ -234,10 +244,7 @@ class ChecklistPageState extends State<ChecklistPage> {
                     },
                     onLongPress: () {
                       setState(() {
-                        controller.selectionMode = true;
-                        controller.selectedTasks.add(
-                          item.id,
-                        );
+                        controller.startSelection(item.id);
                       });
                     },
                   );

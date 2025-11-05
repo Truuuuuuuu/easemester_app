@@ -49,7 +49,6 @@ class ChecklistController extends ChangeNotifier {
     await repository.deleteItem(uid, id);
   }
 
-  
   // Selection & multi-delete
   void startSelection(String itemId) {
     selectionMode = true;
@@ -73,13 +72,15 @@ class ChecklistController extends ChangeNotifier {
   }
 
   Future<void> deleteSelected() async {
-    for (final id in selectedTasks) {
+    final itemsToDelete = selectedTasks
+        .toList(); 
+    for (final id in itemsToDelete) {
       await deleteItem(id);
     }
     clearSelection();
   }
 
   // Pending tasks counter
-  int get pendingCount => _items.where((item) => !item.completed).length;
-
+  int get pendingCount =>
+      _items.where((item) => !item.completed).length;
 }

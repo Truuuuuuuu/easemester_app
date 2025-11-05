@@ -38,16 +38,22 @@ class ChecklistCard extends StatelessWidget {
           horizontal: 12,
           vertical: 6,
         ),
-        color: isSelected
-            ? Colors.blue.withOpacity(0.1)
-            : null,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color: isSelected
+                ? Colors.blue
+                : Colors.grey,
+            width: isSelected ? 2 : 0,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        elevation: 1,
         child: ListTile(
-          leading: selectionMode
-              ? Checkbox(
-                  value: isSelected,
-                  onChanged: (_) {},
-                )
-              : Checkbox(value: done, onChanged: onChanged),
+          //reflects the `done` state
+          leading: Checkbox(
+            value: done,
+            onChanged: onChanged,
+          ),
           title: isEditing
               ? TextField(
                   controller: editingController,
