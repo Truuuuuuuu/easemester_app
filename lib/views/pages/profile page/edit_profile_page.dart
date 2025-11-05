@@ -132,49 +132,64 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (mounted) Navigator.pop(context, true);
   }
 
-  Widget _buildTextField({
+  Widget _buildLabeledField({
+    required String label,
     required TextEditingController controller,
-    required String hint,
   }) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextField(
-        controller: controller,
-        style: TextStyle(color: colorScheme.onSurface),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(
-            color: colorScheme.onSurface.withOpacity(0.6),
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface.withOpacity(0.8),
+            ),
           ),
-          filled: true,
-          fillColor: colorScheme.surface,
-          prefixIcon: hint == "Name"
-              ? Icon(
-                  Icons.person,
-                  color: colorScheme.onSurface,
-                )
-              : hint == "College"
-              ? Icon(
-                  Icons.school,
-                  color: colorScheme.onSurface,
-                )
-              : hint == "Course"
-              ? Icon(
-                  Icons.menu_book,
-                  color: colorScheme.onSurface,
-                )
-              : Icon(
-                  Icons.location_on,
-                  color: colorScheme.onSurface,
+          const SizedBox(height: 6),
+          TextField(
+            controller: controller,
+            style: TextStyle(color: colorScheme.onSurface),
+            decoration: InputDecoration(
+              hintText: "Enter $label",
+              hintStyle: TextStyle(
+                color: colorScheme.onSurface.withOpacity(
+                  0.5,
                 ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 12,
+                horizontal: 14,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: colorScheme.primary,
+                  width: 1.5,
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -250,22 +265,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ],
               ),
               const SizedBox(height: 16),
-              _buildTextField(
+              _buildLabeledField(
+                label: "Name",
                 controller: nameController,
-                hint: "Name",
               ),
-              _buildTextField(
+              _buildLabeledField(
+                label: "College",
                 controller: collegeController,
-                hint: "College",
               ),
-              _buildTextField(
+              _buildLabeledField(
+                label: "Course",
                 controller: courseController,
-                hint: "Course",
               ),
-              _buildTextField(
+              _buildLabeledField(
+                label: "Address",
                 controller: addressController,
-                hint: "Address",
               ),
+
               const SizedBox(height: 24),
               SizedBox(
                 width: width,

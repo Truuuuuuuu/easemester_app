@@ -81,7 +81,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
       body: SafeArea(
         child: Container(
-          // Removed gradient from body since it's now in the AppBar
           child: isLoading
               ? const Center(
                   child: CircularProgressIndicator(),
@@ -215,12 +214,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                       // achievement page
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                      foregroundColor:
-                                          Colors.white,
+                                      backgroundColor: Color.fromARGB(255, 9, 35, 64),  // fixed blue
+                                      foregroundColor: Colors
+                                          .white, // white text/icon
                                       padding:
                                           const EdgeInsets.symmetric(
                                             vertical: 10,
@@ -239,54 +235,82 @@ class _ProfilePageState extends State<ProfilePage> {
                           ],
                         ),
                       ),
-
                       // Additional Info Section
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Details',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        margin: EdgeInsets.zero,
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surface,
+                          borderRadius:
+                              BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Theme.of(
+                              context,
+                            ).dividerColor.withOpacity(0.3),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black
+                                  .withOpacity(0.05),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+                            Align(
+                              alignment:
+                                  Alignment.centerLeft,
+                              child: Text(
+                                'Details',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight:
+                                          FontWeight.bold,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                    ),
                               ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            _buildInfoTile(
+                              icon: Icons.school,
+                              title: "College/University",
+                              subtitle: college.isNotEmpty
+                                  ? college
+                                  : "Not set",
+                            ),
+                            const SizedBox(height: 24),
+
+                            _buildInfoTile(
+                              icon: Icons.menu_book,
+                              title: "Course",
+                              subtitle: course.isNotEmpty
+                                  ? course
+                                  : "Not set",
+                            ),
+                            const SizedBox(height: 24),
+
+                            _buildInfoTile(
+                              icon: Icons.location_on,
+                              title: "Address",
+                              subtitle: address.isNotEmpty
+                                  ? address
+                                  : "Not set",
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      _buildInfoTile(
-                        icon: Icons.school,
-                        title: "College/University",
-                        subtitle: college.isNotEmpty
-                            ? college
-                            : "Not set",
-                      ),
-                      const Divider(
-                        height: 24,
-                        thickness: 1,
-                      ),
-                      _buildInfoTile(
-                        icon: Icons.menu_book,
-                        title: "Course",
-                        subtitle: course.isNotEmpty
-                            ? course
-                            : "Not set",
-                      ),
-                      const Divider(
-                        height: 24,
-                        thickness: 1,
-                      ),
-                      _buildInfoTile(
-                        icon: Icons.location_on,
-                        title: "Address",
-                        subtitle: address.isNotEmpty
-                            ? address
-                            : "Not set",
-                      ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 25),
 
                       // Sign Out Button
                       SizedBox(
