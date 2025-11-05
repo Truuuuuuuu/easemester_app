@@ -13,8 +13,7 @@ class NoteDetailPage extends StatefulWidget {
   });
 
   @override
-  State<NoteDetailPage> createState() =>
-      _NoteDetailPageState();
+  State<NoteDetailPage> createState() => _NoteDetailPageState();
 }
 
 class _NoteDetailPageState extends State<NoteDetailPage> {
@@ -24,18 +23,15 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(
-      text: widget.note.title,
-    );
-    _contentController = TextEditingController(
-      text: widget.note.content,
-    );
+    _titleController = TextEditingController(text: widget.note.title);
+    _contentController = TextEditingController(text: widget.note.content);
   }
 
+  // Automatically save note when user leaves or presses back
   void _saveNote() {
     final updatedNote = widget.note.copyWith(
-      title: _titleController.text,
-      content: _contentController.text,
+      title: _titleController.text.trim(),
+      content: _contentController.text.trim(),
       updatedAt: DateTime.now(),
     );
 
@@ -44,6 +40,7 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
 
   @override
   void dispose() {
+    _saveNote(); //ensure note saves even if widget disposes unexpectedly
     _titleController.dispose();
     _contentController.dispose();
     super.dispose();
@@ -53,11 +50,24 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        _saveNote(); // Save on back
-        return true; // Allow back navigation
+        _saveNote(); // Save automatically when pressing back
+        return true;
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         appBar: AppBar(
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: Theme.of(context).iconTheme.color,
+              size: 20,
+            ),
+            onPressed: () {
+              _saveNote(); //Save before popping
+              Navigator.pop(context);
+            },
+          ),
           title: Hero(
             tag: widget.note.title,
             child: Material(
@@ -70,6 +80,8 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
                 ),
                 decoration: const InputDecoration(
                   border: InputBorder.none,
+                  hintText: "Title", // MARKED: hint for clarity
+                  hintStyle: TextStyle(color: Colors.grey),
                 ),
               ),
             ),
@@ -84,13 +96,17 @@ class _NoteDetailPageState extends State<NoteDetailPage> {
                 type: MaterialType.transparency,
                 child: TextField(
                   controller: _contentController,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  maxLines: null,
                   style: const TextStyle(
                     fontSize: 16,
                     height: 1.5,
                   ),
-                  maxLines: null,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
+                    hintText: "Enter a note", // placeholder when empty
+                    hintStyle: TextStyle(color: Colors.grey),
                   ),
                 ),
               ),

@@ -77,7 +77,6 @@ Future<void> confirmDeleteTasks(
 }
 
 //confirm deletion for files
-// ✅ Confirm deletion for files
 Future<void> confirmDeleteFile(
   BuildContext context,
   HomeController controller,
@@ -115,7 +114,7 @@ Future<void> confirmDeleteFile(
   }
 }
 
-/// Generic input dialog for adding Notes or Tasks
+/// Generic input dialog for adding Notes
 Future<Map<String, String>?> showInputDialog({
   required BuildContext context,
   required String title,

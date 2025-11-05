@@ -16,14 +16,18 @@ class NoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Hero(
-      tag: note.title, 
+      tag: note.title,
       child: Card(
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: isSelected ? Colors.blue : Colors.grey, 
+            width: isSelected ? 2 : 1,                     
+          ),
         ),
         color: isSelected
-            ? Colors.blue.withOpacity(0.2)
+            ? null
             : null,
         child: Padding(
           padding: const EdgeInsets.all(12),

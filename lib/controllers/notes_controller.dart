@@ -44,6 +44,18 @@ class NotesController extends ChangeNotifier {
 
   // <<<UPDATE>>>
   Future<void> updateNote(NoteModel note) async {
+    // Find the old version in memory to compare
+    final oldNote = _notes.firstWhere(
+      (n) => n.id == note.id,
+      orElse: () => note,
+    );
+
+    // Avoid redundant Firestore writes
+    if (oldNote.title == note.title &&
+        oldNote.content == note.content) {
+      return;
+    }
+
     final updated = note.copyWith(
       updatedAt: DateTime.now(),
     );
@@ -79,6 +91,12 @@ class NotesController extends ChangeNotifier {
       selectedNotes.remove(noteId);
     } else {
       selectedNotes.add(noteId);
+    }
+    // Auto-exit selection mode when no notes are selected
+    if (selectedNotes.isEmpty) {
+      selectionMode = false;
+    } else {
+      selectionMode = true;
     }
     notifyListeners();
   }

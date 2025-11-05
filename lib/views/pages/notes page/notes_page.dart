@@ -29,70 +29,64 @@ class NotesPageState extends State<NotesPage> {
             controller.selectionMode &&
             controller.selectedNotes.isNotEmpty;
 
-        return Scaffold(
-          body: Column(
+        // ✅ FIXED: Removed inner Scaffold to prevent keyboard overlap
+        return SafeArea(
+          child: Column(
             children: [
-              // Top label or selection bar
-              hasSelection
-                  ? Container(
-                      color:
-                          Theme.of(context).brightness ==
-                              Brightness.light
-                          ? Colors.grey[200] // light mode
-                          : Colors.grey[800], // dark mode
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+              // Title always visible
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    "Notes",
+                    style: AppFonts.title,
+                  ),
+                ),
+              ),
+
+              // Selection bar
+              if (hasSelection)
+                Container(
+                  
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  child: Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${controller.selectedNotes.length} selected',
                       ),
-                      child: Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                      Row(
                         children: [
-                          Text(
-                            '${controller.selectedNotes.length} selected',
+                          IconButton(
+                            icon: const Icon(
+                              FontAwesomeIcons.trashCan,
+                              color: Colors.red,
+                            ),
+                            onPressed: () =>
+                                confirmDeleteNotes(
+                                  context,
+                                  controller,
+                                ),
                           ),
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: FaIcon(
-                                  FontAwesomeIcons.trashCan,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () =>
-                                    confirmDeleteNotes(
-                                      context,
-                                      controller,
-                                    ),
-                              ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.close,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    controller
-                                        .clearSelection();
-                                  });
-                                },
-                              ),
-                            ],
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () {
+                              controller.clearSelection();
+                            },
                           ),
                         ],
                       ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "Notes",
-                          style: AppFonts.title,
-                        ),
-                      ),
-                    ),
+                    ],
+                  ),
+                ),
 
               // Search bar (only when not in selection mode)
               if (!controller.selectionMode)
@@ -108,6 +102,24 @@ class NotesPageState extends State<NotesPage> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(
                           8,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(
+                          8,
+                        ),
+                        borderSide: const BorderSide(
+                          color: Colors.grey,
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(
+                          8,
+                        ),
+                        borderSide: const BorderSide(
+                          color: Colors.blue,
+                          width: 2.5,
                         ),
                       ),
                       filled: true,
@@ -156,12 +168,9 @@ class NotesPageState extends State<NotesPage> {
                             onTap: () {
                               if (controller
                                   .selectionMode) {
-                                setState(() {
-                                  controller
-                                      .toggleSelection(
-                                        note.id,
-                                      );
-                                });
+                                controller.toggleSelection(
+                                  note.id,
+                                );
                               } else {
                                 Navigator.push(
                                   context,
