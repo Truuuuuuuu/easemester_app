@@ -42,15 +42,13 @@ class _AddNoteFormPageState extends State<AddNoteFormPage> {
       isDense: true,
       fillColor: isDark
           ? const Color(0xFF2C2C2C) // dark grey
-          : const Color.fromARGB(
-              255,
-              242,
-              242,
-              242,
-            ), // light grey
+          : const Color.fromARGB(255, 240, 240, 240), 
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
+        borderSide: const BorderSide(
+          color: Colors.grey, 
+          width: 1.0,
+        ),
       ),
     );
   }
@@ -119,7 +117,7 @@ class _AddNoteFormPageState extends State<AddNoteFormPage> {
                       ),
                     ),
                     backgroundColor:
-                        theme.colorScheme.primary,
+                        Colors.blue,
                   ),
                   label: const Text(
                     "Save Note", style: TextStyle(
