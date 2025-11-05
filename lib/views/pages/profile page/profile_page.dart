@@ -3,6 +3,7 @@ import 'package:easemester_app/helpers/dialog_helpers.dart';
 import 'package:easemester_app/models/profile_model.dart';
 import 'package:easemester_app/services/firestore_service.dart';
 import 'package:easemester_app/routes/navigation_helper.dart';
+import 'package:easemester_app/views/pages/achievement_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easemester_app/views/widgets/app_drawer.dart';
@@ -211,10 +212,23 @@ class _ProfilePageState extends State<ProfilePage> {
                                       'Achievements',
                                     ),
                                     onPressed: () {
-                                      // achievement page
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AchievementPage(),
+                                        ),
+                                      );
                                     },
+
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color.fromARGB(255, 9, 35, 64),  // fixed blue
+                                      backgroundColor:
+                                          Color.fromARGB(
+                                            255,
+                                            9,
+                                            35,
+                                            64,
+                                          ), // fixed blue
                                       foregroundColor: Colors
                                           .white, // white text/icon
                                       padding:
