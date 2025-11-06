@@ -91,6 +91,17 @@ class FirestoreService {
     ).orderBy('createdAt', descending: true).snapshots();
   }
 
+  // <<COUNT ALL PENDING CHECKLIST TASKS>>
+  Stream<int> pendingChecklistCountStream(String uid) {
+    return _db
+        .collection('users')
+        .doc(uid)
+        .collection('checklist')
+        .where('completed', isEqualTo: false)
+        .snapshots()
+        .map((snap) => snap.size);
+  }
+
   //<<COUNT TOTAL FILES>>
   Stream<int> totalFilesCountStream(String uid) {
     final filesStream = _db

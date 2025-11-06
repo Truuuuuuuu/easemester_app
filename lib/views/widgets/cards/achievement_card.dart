@@ -1,7 +1,6 @@
 import 'package:easemester_app/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:easemester_app/data/notifiers.dart';
 
 class AchievementItem extends StatelessWidget {
   final String title;
@@ -32,17 +31,21 @@ class AchievementItem extends StatelessWidget {
       );
     }
 
-    return AnimatedBuilder(
-      animation: checklistControllerNotifier,
-      builder: (context, _) {
-        final count = isPending
-            ? checklistControllerNotifier.pendingCount
-                  .toString()
-            : "0";
+    if (isPending) {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) return _buildCount("0", context);
 
-        return _buildCount(count, context);
-      },
-    );
+      return StreamBuilder<int>(
+        stream: FirestoreService()
+            .pendingChecklistCountStream(uid),
+        builder: (context, snapshot) {
+          final count = snapshot.data?.toString() ?? "0";
+          return _buildCount(count, context);
+        },
+      );
+    }
+    //Default fallback widget (fixes the error)
+    return _buildCount("0", context);
   }
 
   Widget _buildCount(String count, BuildContext context) {
@@ -62,7 +65,7 @@ class AchievementItem extends StatelessWidget {
           title,
           style: const TextStyle(
             fontSize: 10,
-            color: Colors.white, 
+            color: Colors.white,
           ),
           textAlign: TextAlign.center,
         ),

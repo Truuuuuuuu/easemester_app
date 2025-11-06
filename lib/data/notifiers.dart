@@ -28,11 +28,3 @@ Future<void> toggleTheme() async {
 }
 
 
-//pending task 
-final checklistControllerNotifier = ChecklistController(
-    repository: ChecklistRepository(
-      firestoreService: FirestoreService(),
-    ),
-    uid: FirebaseAuth.instance.currentUser?.uid ?? "",
-);
-
