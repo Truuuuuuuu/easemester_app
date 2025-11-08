@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easemester_app/services/firestore_service.dart';
 import '../models/file_card_model.dart';
 
 class FileRepository {
@@ -101,10 +102,11 @@ class FileRepository {
         .doc(uid)
         .collection('studyHubFiles')
         .doc(fileId);
-    
+
     await docRef.update({'aiFeatures': summary});
   }
 
+  
   /// Delete file from both StudyHubFiles and Files tab
   Future<void> deleteFile(String uid, String fileId) async {
     final userRef = firestore.collection('users').doc(uid);

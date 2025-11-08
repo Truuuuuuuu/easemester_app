@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easemester_app/repositories/achivement_repository.dart';
 import 'package:easemester_app/services/openai_service.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -26,6 +27,8 @@ class HomeController extends ChangeNotifier {
   final FileRepository _fileRepository = FileRepository(
     firestore: FirebaseFirestore.instance,
   );
+  final AchievementRepository _achievementRepository =
+    AchievementRepository(firestore: FirebaseFirestore.instance);
 
   HomeController({required this.tabController}) {
     _initStreams();
@@ -108,6 +111,8 @@ class HomeController extends ChangeNotifier {
           docRef.id,
         );
       }
+      await _achievementRepository.incrementFilesUploaded(uid);
+
       print(
         "✅ Uploaded file with ${isStudyHub ? 'StudyHub' : 'Files'} ID: ${docRef.id}",
       );
@@ -145,9 +150,9 @@ class HomeController extends ChangeNotifier {
         "quiz": quiz,
         "flashcards": flashcards,
         "quizAnswers": {
-          "userAnswers": {}, 
-          "isCompleted": false, 
-          "score": 0, 
+          "userAnswers": {},
+          "isCompleted": false,
+          "score": 0,
         },
       };
       final updatedFile = file.copyWith(
