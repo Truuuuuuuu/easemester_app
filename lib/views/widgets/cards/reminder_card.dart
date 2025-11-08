@@ -6,46 +6,40 @@ class AchievementItem extends StatelessWidget {
   final String title;
   final bool isPending;
   final bool isFiles;
+  final bool isQuiz; // For completed quizzes
 
   const AchievementItem({
     super.key,
     required this.title,
     this.isPending = false,
     this.isFiles = false,
+    this.isQuiz = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (isFiles) {
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid == null) return _buildCount("0", context);
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return _buildCount("0", context);
 
-      return StreamBuilder<int>(
-        stream: FirestoreService().totalFilesCountStream(
-          uid,
-        ),
-        builder: (context, snapshot) {
-          final count = snapshot.data?.toString() ?? "0";
-          return _buildCount(count, context);
-        },
-      );
+    Stream<int>? countStream;
+
+    if (isQuiz) {
+      countStream = FirestoreService().completedQuizCountStream(uid);
+    } else if (isFiles) {
+      countStream = FirestoreService().totalFilesCountStream(uid);
+    } else if (isPending) {
+      countStream = FirestoreService().pendingChecklistCountStream(uid);
     }
 
-    if (isPending) {
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid == null) return _buildCount("0", context);
+    if (countStream == null) return _buildCount("0", context);
 
-      return StreamBuilder<int>(
-        stream: FirestoreService()
-            .pendingChecklistCountStream(uid),
-        builder: (context, snapshot) {
-          final count = snapshot.data?.toString() ?? "0";
-          return _buildCount(count, context);
-        },
-      );
-    }
-    //Default fallback widget (fixes the error)
-    return _buildCount("0", context);
+    return StreamBuilder<int>(
+      stream: countStream,
+      builder: (context, snapshot) {
+        final count = snapshot.data?.toString() ?? "0";
+        return _buildCount(count, context);
+      },
+    );
   }
 
   Widget _buildCount(String count, BuildContext context) {

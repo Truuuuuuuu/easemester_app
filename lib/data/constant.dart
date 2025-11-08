@@ -33,7 +33,14 @@ class AppFonts {
     fontSize: 14,
     fontWeight: FontWeight.w500,
   );
+  
+  static TextStyle themed(BuildContext context, TextStyle base) {
+    return base.copyWith(
+      color: Theme.of(context).colorScheme.onSurface,
+    );
+  }
 }
+
 
 //for color coding
 class AppColor {

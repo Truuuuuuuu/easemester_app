@@ -125,4 +125,36 @@ class FirestoreService {
           filesCount + studyHubCount,
     );
   }
+
+  // <<COUNT COMPLETED QUIZZES>>
+  Stream<int> completedQuizCountStream(String uid) {
+    return _db
+        .collection('users')
+        .doc(uid)
+        .collection('studyHubFiles')
+        .snapshots()
+        .map((filesSnapshot) {
+          int completedCount = 0;
+
+          for (final fileDoc in filesSnapshot.docs) {
+            final aiFeatures =
+                fileDoc.get('aiFeatures')
+                    as Map<String, dynamic>?;
+
+            if (aiFeatures != null) {
+              final quizAnswers =
+                  aiFeatures['quizAnswers']
+                      as Map<String, dynamic>?;
+
+              if (quizAnswers != null) {
+                if (quizAnswers['isCompleted'] == true) {
+                  completedCount += 1;
+                }
+              }
+            }
+          }
+
+          return completedCount;
+        });
+  }
 }
