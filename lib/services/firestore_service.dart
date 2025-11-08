@@ -102,59 +102,49 @@ class FirestoreService {
         .map((snap) => snap.size);
   }
 
-  //<<COUNT TOTAL FILES>>
-  Stream<int> totalFilesCountStream(String uid) {
-    final filesStream = _db
-        .collection("users")
-        .doc(uid)
-        .collection("files")
-        .snapshots()
-        .map((snap) => snap.size);
-
-    final studyHubStream = _db
+  // <<COUNT STUDYHUB FILES WITH aiFeatures>>
+  Stream<int> activeFilesCountStream(String uid) {
+    return _db
         .collection("users")
         .doc(uid)
         .collection("studyHubFiles")
+        .where('aiFeatures', isGreaterThan: {})
         .snapshots()
         .map((snap) => snap.size);
-
-    return Rx.combineLatest2<int, int, int>(
-      filesStream,
-      studyHubStream,
-      (filesCount, studyHubCount) =>
-          filesCount + studyHubCount,
-    );
   }
 
-  // <<COUNT COMPLETED QUIZZES>>
-  Stream<int> completedQuizCountStream(String uid) {
+  // <<COUNT PENDING QUIZZES>>
+  Stream<int> pendingQuizCountStream(String uid) {
     return _db
         .collection('users')
         .doc(uid)
         .collection('studyHubFiles')
         .snapshots()
         .map((filesSnapshot) {
-          int completedCount = 0;
+          int pendingCount = 0;
 
           for (final fileDoc in filesSnapshot.docs) {
             final aiFeatures =
-                fileDoc.get('aiFeatures')
+                fileDoc.data()['aiFeatures']
                     as Map<String, dynamic>?;
 
-            if (aiFeatures != null) {
-              final quizAnswers =
-                  aiFeatures['quizAnswers']
-                      as Map<String, dynamic>?;
+            if (aiFeatures == null) {
+              //avoid count dropiing zero
+              pendingCount += 0;
+              continue;
+            }
 
-              if (quizAnswers != null) {
-                if (quizAnswers['isCompleted'] == true) {
-                  completedCount += 1;
-                }
-              }
+            final quizAnswers =
+                aiFeatures['quizAnswers']
+                    as Map<String, dynamic>?;
+
+            if (quizAnswers == null ||
+                quizAnswers['isCompleted'] == false) {
+              pendingCount += 1;
             }
           }
 
-          return completedCount;
+          return pendingCount;
         });
   }
 }

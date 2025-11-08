@@ -36,11 +36,11 @@ class HomePage extends StatelessWidget {
                         MainAxisAlignment.spaceAround,
                     children: [
                       AchievementItem(
-                        title: "Files Uploaded",
+                        title: "Active Files",
                         isFiles: true,
                       ),
                       AchievementItem(
-                        title: "Quizzes Completed",
+                        title: "Pending Quizzes",
                         isQuiz: true,
                       ),
                       AchievementItem(

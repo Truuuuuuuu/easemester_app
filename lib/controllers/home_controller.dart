@@ -74,22 +74,26 @@ class HomeController extends ChangeNotifier {
       final file = File(path);
       final uid = FirebaseAuth.instance.currentUser!.uid;
       // Upload to Cloudinary
-      final uploadResult = await _cloudinaryService.uploadFile(file);
+      final uploadResult = await _cloudinaryService
+          .uploadFile(file);
       if (uploadResult == null) return;
       final fileUrl = uploadResult['url'];
       final publicId = uploadResult['public_id'];
       // Firestore doc (studyHubFiles or files)
       final docRef = _firestore
-        .collection('users')
-        .doc(uid)
-        .collection(isStudyHub ? 'studyHubFiles' : 'files')
-        .doc();
+          .collection('users')
+          .doc(uid)
+          .collection(
+            isStudyHub ? 'studyHubFiles' : 'files',
+          )
+          .doc();
       final fileCard = FileCardModel(
         id: docRef.id,
         fileName: result.files.first.name,
         fileUrl: fileUrl,
         publicId: publicId,
-        description: "Uploaded on ${DateTime.now().toLocal()}",
+        description:
+            "Uploaded on ${DateTime.now().toLocal()}",
       );
       if (isStudyHub) {
         await _fileRepository.addStudyHubFile(
@@ -104,30 +108,47 @@ class HomeController extends ChangeNotifier {
           docRef.id,
         );
       }
-      print("✅ Uploaded file with ${isStudyHub ? 'StudyHub' : 'Files'} ID: ${docRef.id}");
+      print(
+        "✅ Uploaded file with ${isStudyHub ? 'StudyHub' : 'Files'} ID: ${docRef.id}",
+      );
     } catch (e) {
       print("⚠️ Error uploading file: $e");
     }
   }
 
   /// Extract and run AI features on a file (Files tab on demand)
-  Future<FileCardModel?> runExtractionAndAI(FileCardModel file, {bool isStudyHub = false}) async {
+  Future<FileCardModel?> runExtractionAndAI(
+    FileCardModel file, {
+    bool isStudyHub = false,
+  }) async {
     try {
       final path = file.fileUrl;
-      String? extractedText = await FileExtractor.pickAndExtractFromPath(
-        path,
-        fileId: file.id,
-        isStudyHub: isStudyHub,
-      );
-      if (extractedText == null || extractedText.isEmpty) return null;
+      String? extractedText =
+          await FileExtractor.pickAndExtractFromPath(
+            path,
+            fileId: file.id,
+            isStudyHub: isStudyHub,
+          );
+      if (extractedText == null || extractedText.isEmpty)
+        return null;
       final openAIService = OpenAIService();
-      final summary = await openAIService.generateSummary(extractedText);
-      final quiz = await openAIService.generateShortQuiz(summary);
-      final flashcards = await openAIService.generateFlashcards(extractedText);
+      final summary = await openAIService.generateSummary(
+        extractedText,
+      );
+      final quiz = await openAIService.generateShortQuiz(
+        summary,
+      );
+      final flashcards = await openAIService
+          .generateFlashcards(extractedText);
       final aiFeatures = {
         "summary": summary,
         "quiz": quiz,
         "flashcards": flashcards,
+        "quizAnswers": {
+          "userAnswers": {}, 
+          "isCompleted": false, 
+          "score": 0, 
+        },
       };
       final updatedFile = file.copyWith(
         fileText: extractedText,
@@ -142,14 +163,18 @@ class HomeController extends ChangeNotifier {
           updatedFile.id,
         );
         // Update local state (for reactivity)
-        final index = studyHubCards.indexWhere((f) => f.id == file.id);
+        final index = studyHubCards.indexWhere(
+          (f) => f.id == file.id,
+        );
         if (index >= 0) {
           studyHubCards[index] = updatedFile;
           notifyListeners();
         }
       } else {
         // Only update the files collection and local state for Files tab, never from StudyHub flow!
-        final index = filesCards.indexWhere((f) => f.id == file.id);
+        final index = filesCards.indexWhere(
+          (f) => f.id == file.id,
+        );
         if (index >= 0) {
           filesCards[index] = updatedFile;
           notifyListeners();
@@ -212,8 +237,6 @@ class HomeController extends ChangeNotifier {
           .delete();
 
       print("✅ Firestore file deleted: ${file.fileName}");
-
-     
 
       // 3️⃣ Update local state
       filesCards.removeWhere((f) => f.id == file.id);

@@ -101,7 +101,7 @@ class FileRepository {
         .doc(uid)
         .collection('studyHubFiles')
         .doc(fileId);
-
+    
     await docRef.update({'aiFeatures': summary});
   }
 

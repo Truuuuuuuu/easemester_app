@@ -6,7 +6,7 @@ class AchievementItem extends StatelessWidget {
   final String title;
   final bool isPending;
   final bool isFiles;
-  final bool isQuiz; // For completed quizzes
+  final bool isQuiz; 
 
   const AchievementItem({
     super.key,
@@ -24,9 +24,9 @@ class AchievementItem extends StatelessWidget {
     Stream<int>? countStream;
 
     if (isQuiz) {
-      countStream = FirestoreService().completedQuizCountStream(uid);
+      countStream = FirestoreService().pendingQuizCountStream(uid);
     } else if (isFiles) {
-      countStream = FirestoreService().totalFilesCountStream(uid);
+      countStream = FirestoreService().activeFilesCountStream(uid);
     } else if (isPending) {
       countStream = FirestoreService().pendingChecklistCountStream(uid);
     }
