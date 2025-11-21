@@ -65,7 +65,7 @@ class AchievementCard extends StatelessWidget {
         return const Icon(Icons.check_circle, color: Colors.green, size: 36);
       case "Notes Created":
         return const Icon(Icons.note, color: Colors.amber, size: 36);
-      case "Review Flash Cards":
+      case "Generated Flash Cards":
         return const Icon(Icons.style, color: Colors.pink, size: 36);
       case "Login Streak (Days)":
         return const Icon(Icons.local_fire_department, color: Colors.red, size: 36);

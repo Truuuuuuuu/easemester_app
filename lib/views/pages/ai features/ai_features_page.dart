@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:easemester_app/models/file_card_model.dart';
+import 'package:easemester_app/repositories/achivement_repository.dart';
 import 'package:easemester_app/views/pages/ai%20features/flash_card_page.dart';
 import 'package:easemester_app/views/pages/ai%20features/short_quiz_page.dart';
 import 'package:easemester_app/views/widgets/app_drawer.dart';
@@ -13,6 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class FeaturePage extends StatefulWidget {
   final FileCardModel file;
   final bool isStudyHub; // Only StudyHub should auto-generate
+  
   const FeaturePage({super.key, required this.file, this.isStudyHub = true});
 
   @override
@@ -22,7 +24,8 @@ class FeaturePage extends StatefulWidget {
 class _FeaturePageState extends State<FeaturePage> {
   bool isGeneratingAI = false;
   late FileCardModel currentFile;
-
+  final AchievementRepository _achievementRepository =
+      AchievementRepository(firestore: FirebaseFirestore.instance);
   @override
   void initState() {
     super.initState();
@@ -99,7 +102,7 @@ class _FeaturePageState extends State<FeaturePage> {
       {
         'title': 'Short Quiz',
         'imageIcon': 'assets/images/quiz.png',
-        'route': ShortQuizPage(file: currentFile),
+        'route': ShortQuizPage(file: currentFile,  achievementRepository: _achievementRepository,),
         'image': 'assets/images/quiz_card.png',
       },
     ];

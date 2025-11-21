@@ -1,19 +1,28 @@
 import 'package:easemester_app/models/file_card_model.dart';
 import 'package:easemester_app/data/constant.dart';
 import 'package:easemester_app/controllers/quiz_controller.dart';
+import 'package:easemester_app/repositories/achivement_repository.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ShortQuizPage extends StatefulWidget {
   final FileCardModel file;
-  const ShortQuizPage({super.key, required this.file});
+  final AchievementRepository achievementRepository;
+  const ShortQuizPage({
+    super.key,
+    required this.file,
+    required this.achievementRepository,
+  });
 
   @override
-  State<ShortQuizPage> createState() => _ShortQuizPageState();
+  State<ShortQuizPage> createState() =>
+      _ShortQuizPageState();
 }
 
 class _ShortQuizPageState extends State<ShortQuizPage> {
   final QuizController _controller = QuizController();
-  final Map<int, TextEditingController> _textControllers = {};
+  final Map<int, TextEditingController> _textControllers =
+      {};
   bool _loading = true;
 
   @override
@@ -68,8 +77,12 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
           icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.primary,
+        foregroundColor: Theme.of(
+          context,
+        ).colorScheme.onPrimary,
         centerTitle: true,
         title: Column(
           children: [
@@ -79,7 +92,9 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
             ),
             Text(
               widget.file.fileName,
-              style: AppFonts.paragraph.copyWith(fontSize: 14),
+              style: AppFonts.paragraph.copyWith(
+                fontSize: 14,
+              ),
             ),
           ],
         ),
@@ -89,7 +104,9 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              Theme.of(
+                context,
+              ).colorScheme.primary.withOpacity(0.1),
               Theme.of(context).colorScheme.surface,
             ],
             begin: Alignment.topCenter,
@@ -122,17 +139,31 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
                   final item = quizList[index];
                   final question = item['question'];
                   final correctAnswer =
-                      item['answer']?.toString().trim().toLowerCase() ?? '';
+                      item['answer']
+                          ?.toString()
+                          .trim()
+                          .toLowerCase() ??
+                      '';
                   final userAnswer =
-                      _controller.userAnswers[index]?.trim().toLowerCase() ?? '';
-                  final isCorrect = _controller.submitted && userAnswer == correctAnswer;
+                      _controller.userAnswers[index]
+                          ?.trim()
+                          .toLowerCase() ??
+                      '';
+                  final isCorrect =
+                      _controller.submitted &&
+                      userAnswer == correctAnswer;
 
                   _textControllers.putIfAbsent(index, () {
                     final c = TextEditingController(
-                      text: _controller.userAnswers[index] ?? '',
+                      text:
+                          _controller.userAnswers[index] ??
+                          '',
                     );
                     c.addListener(() {
-                      _controller.updateAnswer(index, c.text);
+                      _controller.updateAnswer(
+                        index,
+                        c.text,
+                      );
                     });
                     return c;
                   });
@@ -144,86 +175,127 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
                     }
                     return isCorrect
                         ? Colors.green
-                        : Theme.of(context).colorScheme.error;
+                        : Theme.of(
+                            context,
+                          ).colorScheme.error;
                   }
 
                   // Determine TextField fill color
                   Color getFillColor() {
-                    if (!_controller.submitted) return Theme.of(context).colorScheme.surface;
-                    return isCorrect ? Colors.green[50]! : Colors.red[50]!;
+                    if (!_controller.submitted)
+                      return Theme.of(
+                        context,
+                      ).colorScheme.surface;
+                    return isCorrect
+                        ? Colors.green[50]!
+                        : Colors.red[50]!;
                   }
 
                   // Determine display text
                   String displayAnswer() {
-                    if (!_controller.submitted) return _controller.userAnswers[index] ?? '';
-                    if (userAnswer.isEmpty) return 'No Answer';
-                    return _controller.userAnswers[index] ?? '';
+                    if (!_controller.submitted)
+                      return _controller
+                              .userAnswers[index] ??
+                          '';
+                    if (userAnswer.isEmpty)
+                      return 'No Answer';
+                    return _controller.userAnswers[index] ??
+                        '';
                   }
 
                   // Update TextField text after submission
-                  _textControllers[index]!.text = displayAnswer();
+                  _textControllers[index]!.text =
+                      displayAnswer();
 
                   return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 8,
+                    ),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: BorderRadius.circular(16),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(
+                        16,
+                      ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withOpacity(
+                            0.05,
+                          ),
                           blurRadius: 6,
                           offset: const Offset(0, 3),
                         ),
                       ],
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
                       children: [
                         Text(
                           'Q${index + 1}: $question',
                           style: AppFonts.heading3.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).textTheme.bodyLarge!.color,
+                            color: Theme.of(
+                              context,
+                            ).textTheme.bodyLarge!.color,
                           ),
                         ),
                         const SizedBox(height: 8),
                         TextField(
-                          controller: _textControllers[index],
+                          controller:
+                              _textControllers[index],
                           enabled: !_controller.submitted,
                           style: TextStyle(
                             color: !_controller.submitted
-                                ? Theme.of(context).textTheme.bodyLarge!.color
+                                ? Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge!
+                                      .color
                                 : isCorrect
-                                    ? Colors.green[800]
-                                    : (userAnswer.isEmpty
-                                        ? Colors.grey[600]
-                                        : Colors.red[800]),
+                                ? Colors.green[800]
+                                : (userAnswer.isEmpty
+                                      ? Colors.grey[600]
+                                      : Colors.red[800]),
                           ),
                           decoration: InputDecoration(
                             hintText: "Your answer here",
                             filled: true,
                             fillColor: getFillColor(),
                             border: OutlineInputBorder(
-                              borderSide: BorderSide(color: getBorderColor()),
+                              borderSide: BorderSide(
+                                color: getBorderColor(),
+                              ),
                             ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: getBorderColor()),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: getBorderColor(), width: 2),
-                            ),
+                            enabledBorder:
+                                OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: getBorderColor(),
+                                  ),
+                                ),
+                            focusedBorder:
+                                OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: getBorderColor(),
+                                    width: 2,
+                                  ),
+                                ),
                           ),
                         ),
                         if (_controller.submitted)
                           Padding(
-                            padding: const EdgeInsets.only(top: 8),
+                            padding: const EdgeInsets.only(
+                              top: 8,
+                            ),
                             child: Text(
                               'Correct Answer: ${item['answer']}',
                               style: TextStyle(
                                 color: isCorrect
                                     ? Colors.green
-                                    : Theme.of(context).colorScheme.error,
+                                    : Theme.of(
+                                        context,
+                                      ).colorScheme.error,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -247,14 +319,27 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
                           widget.file.id,
                           isCompleted: true,
                         );
+                        // Update Completed Quiz achievement
+                        await widget.achievementRepository
+                            .incrementCompletedQuiz(
+                              FirebaseAuth
+                                  .instance
+                                  .currentUser!
+                                  .uid,
+                            );
+
                         setState(() {});
                       },
                 icon: const Icon(Icons.check),
                 label: const Text('Submit'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green, // Green background
-                  foregroundColor: Colors.white, // White text & icon
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor:
+                      Colors.green, // Green background
+                  foregroundColor:
+                      Colors.white, // White text & icon
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

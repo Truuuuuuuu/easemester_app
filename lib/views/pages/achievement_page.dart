@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 class AchievementPage extends StatelessWidget {
   AchievementPage({super.key});
 
   final AchievementRepository _achievementRepo =
-      AchievementRepository(firestore: FirebaseFirestore.instance);
+      AchievementRepository(
+        firestore: FirebaseFirestore.instance,
+      );
 
   final Map<String, double> _defaultAchievements = {
     "Files Uploaded": 0,
@@ -17,7 +18,7 @@ class AchievementPage extends StatelessWidget {
     "Completed Quiz": 0,
     "Completed Tasks": 0,
     "Notes Created": 0,
-    "Review Flash Cards": 0,
+    "Generated Flash Cards": 0,
     "Login Streak (Days)": 0,
     "Study Hours Logged": 0,
     "Profile Completed": 0,
@@ -34,16 +35,47 @@ class AchievementPage extends StatelessWidget {
       ),
       body: StreamBuilder<int>(
         stream: _achievementRepo.filesUploadedStream(uid),
-        builder: (context, snapshot) {
-          // Copy default achievements and update Files Uploaded dynamically
-          final achievements = Map<String, double>.from(_defaultAchievements);
-          achievements["Files Uploaded"] = snapshot.data?.toDouble() ?? 0;
+        builder: (context, filesSnapshot) {
+          return StreamBuilder<Map<String, dynamic>>(
+            stream: _achievementRepo.generatedContentStream(uid),
+            builder: (context, generatedSnapshot) {
+              return StreamBuilder<int>(
+                stream: _achievementRepo.completedQuizStream(uid),
+                builder: (context, completedQuizSnapshot) {
+                  // Start with default values
+                  final achievements = Map<String, double>.from(
+                    _defaultAchievements,
+                  );
 
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: achievements.entries
-                .map((e) => AchievementCard(title: e.key, value: e.value))
-                .toList(),
+                  // Files Uploaded
+                  achievements["Files Uploaded"] =
+                      filesSnapshot.data?.toDouble() ?? 0;
+
+                  // Generated Content
+                  final generated = generatedSnapshot.data ?? {};
+                  achievements["Total Summaries"] =
+                      (generated["totalSummaries"] ?? 0).toDouble();
+                  achievements["Generated Flash Cards"] =
+                      (generated["totalFlashcards"] ?? 0).toDouble();
+
+                  // Completed Quiz
+                  achievements["Completed Quiz"] =
+                      completedQuizSnapshot.data?.toDouble() ?? 0;
+
+                  return ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: achievements.entries
+                        .map(
+                          (e) => AchievementCard(
+                            title: e.key,
+                            value: e.value,
+                          ),
+                        )
+                        .toList(),
+                  );
+                },
+              );
+            },
           );
         },
       ),

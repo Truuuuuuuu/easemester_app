@@ -28,7 +28,9 @@ class HomeController extends ChangeNotifier {
     firestore: FirebaseFirestore.instance,
   );
   final AchievementRepository _achievementRepository =
-    AchievementRepository(firestore: FirebaseFirestore.instance);
+      AchievementRepository(
+        firestore: FirebaseFirestore.instance,
+      );
 
   HomeController({required this.tabController}) {
     _initStreams();
@@ -111,7 +113,9 @@ class HomeController extends ChangeNotifier {
           docRef.id,
         );
       }
-      await _achievementRepository.incrementFilesUploaded(uid);
+      await _achievementRepository.incrementFilesUploaded(
+        uid,
+      );
 
       print(
         "✅ Uploaded file with ${isStudyHub ? 'StudyHub' : 'Files'} ID: ${docRef.id}",
@@ -160,6 +164,14 @@ class HomeController extends ChangeNotifier {
         aiFeatures: aiFeatures,
       );
       final uid = FirebaseAuth.instance.currentUser!.uid;
+
+      await _achievementRepository.incrementAllFeatures(
+        uid: uid,
+        generatedSummary: true,
+        generatedFlashcards: true,
+        generatedQuiz: true,
+      );
+
       if (isStudyHub) {
         // Only update studyHubFiles collection for StudyHub items
         await _fileRepository.addStudyHubFile(
