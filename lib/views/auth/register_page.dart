@@ -118,7 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     return Scaffold(
       backgroundColor: theme
-          .scaffoldBackgroundColor, // ✅ Theme-aware background
+          .scaffoldBackgroundColor, 
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(
@@ -131,14 +131,12 @@ class _RegisterPageState extends State<RegisterPage> {
               Text(
                 "Create Account",
                 style: TextStyle(
-                  fontSize: 32,
+                  fontSize: 38,
                   fontWeight: FontWeight.bold,
-                  color: theme
-                      .colorScheme
-                      .onSurface, // ✅ Theme-aware text color
+                  color: const Color(0xFF1565C0),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 2),
               Text(
                 "Sign up to continue",
                 style: TextStyle(
@@ -151,33 +149,71 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 32),
 
-              // Name
+              // NAME TEXTFIELD
               TextField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  hintText: 'Full Name',
-                  prefixIcon: Icon(
-                    Icons.person,
-                    color: theme
-                        .iconTheme
-                        .color, // ✅ Theme-aware icon color
+                  labelText: 'Full Name',
+                  labelStyle: TextStyle(
+                    color: isDark
+                        ? Colors.grey[400]
+                        : Colors.grey[600],
+                  ),
+                  floatingLabelStyle: const TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Image.asset(
+                      'assets/images/icons/profile_icon.png',
+                      width: 24,
+                      height: 24,
+                    ),
                   ),
                   filled: true,
                   fillColor: isDark
                       ? Colors.grey[850]
-                      : Colors
-                            .grey[100], // ✅ Conditional fill color
+                      : Colors.grey[100],
+
+                  // Default border
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? Colors.grey[700]!
+                          : Colors.grey[300]!,
+                      width: 1.5,
+                    ),
+                  ),
+
+                  // Non-focused border
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? Colors.grey[700]!
+                          : Colors.grey[300]!,
+                      width: 1.5,
+                    ),
+                  ),
+
+                  // Focused border
+                  focusedBorder: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 2,
+                    ),
                   ),
                 ),
                 style: TextStyle(
-                  color: theme
-                      .colorScheme
-                      .onSurface, // ✅ Theme-aware text input color
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
+
               const SizedBox(height: 16),
 
               // Email
@@ -185,29 +221,67 @@ class _RegisterPageState extends State<RegisterPage> {
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  hintText: 'Email',
-                  prefixIcon: Icon(
-                    Icons.email,
-                    color: theme
-                        .iconTheme
-                        .color, // ✅ Theme-aware icon color
+                  labelText: 'Email',
+                  labelStyle: TextStyle(
+                    color: isDark
+                        ? Colors.grey[400]
+                        : Colors.grey[600],
+                  ),
+                  floatingLabelStyle: const TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Image.asset(
+                      'assets/images/icons/email_icon.png',
+                      width: 24,
+                      height: 24,
+                    ),
                   ),
                   filled: true,
                   fillColor: isDark
                       ? Colors.grey[850]
-                      : Colors
-                            .grey[100], // ✅ Conditional fill color
+                      : Colors.grey[100],
+
+                  // Default border
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? Colors.grey[700]!
+                          : Colors.grey[300]!,
+                      width: 1.5,
+                    ),
+                  ),
+
+                  // Not focused border
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? Colors.grey[700]!
+                          : Colors.grey[300]!,
+                      width: 1.5,
+                    ),
+                  ),
+
+                  // Focused (active) border
+                  focusedBorder: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 2,
+                    ),
                   ),
                 ),
                 style: TextStyle(
-                  color: theme
-                      .colorScheme
-                      .onSurface, // ✅ Theme-aware text input color
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
+
               const SizedBox(height: 16),
 
               // Password
@@ -215,29 +289,61 @@ class _RegisterPageState extends State<RegisterPage> {
                 controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
-                  hintText: 'Password',
-                  prefixIcon: Icon(
-                    Icons.lock,
-                    color: theme
-                        .iconTheme
-                        .color, // ✅ Theme-aware icon color
+                  labelText: 'Password',
+                  labelStyle: TextStyle(
+                    color: isDark
+                        ? Colors.grey[400]
+                        : Colors.grey[600],
+                  ),
+                  floatingLabelStyle: const TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Image.asset(
+                      'assets/images/icons/password_icon.png',
+                      width: 24,
+                      height: 24,
+                    ),
                   ),
                   filled: true,
                   fillColor: isDark
                       ? Colors.grey[850]
-                      : Colors
-                            .grey[100], // ✅ Conditional fill color
+                      : Colors.grey[100],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? Colors.grey[700]!
+                          : Colors.grey[300]!,
+                      width: 1.5,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: isDark
+                          ? Colors.grey[700]!
+                          : Colors.grey[300]!,
+                      width: 1.5,
+                    ),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(12),
+                    ),
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                      width: 2,
+                    ),
                   ),
                 ),
                 style: TextStyle(
-                  color: theme
-                      .colorScheme
-                      .onSurface, // ✅ Theme-aware text input color
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
+
               const SizedBox(height: 32),
 
               // Register button
@@ -247,9 +353,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _register,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: theme
-                        .colorScheme
-                        .primary, // ✅ Theme-aware button color
+                    backgroundColor:  Color(0xFF1565C0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
                         12,
@@ -265,9 +369,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: theme
-                                .colorScheme
-                                .onPrimary, // ✅ Theme-aware button text color
+                            color: Colors.white, // ✅ Theme-aware button text color
                           ),
                         ),
                 ),
