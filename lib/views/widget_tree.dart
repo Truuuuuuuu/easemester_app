@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easemester_app/repositories/achivement_repository.dart';
 import 'package:easemester_app/repositories/checklist_repository.dart';
 import 'package:easemester_app/repositories/notes_repository.dart';
 import 'package:easemester_app/services/firestore_service.dart';
@@ -50,6 +52,9 @@ class _WidgetTreeState extends State<WidgetTree>
         firestoreService: FirestoreService(),
       ),
       uid: currentUid,
+      achievementRepository: AchievementRepository(
+        firestore: FirebaseFirestore.instance,
+      ),
     );
     _checklistController = ChecklistController(
       repository: ChecklistRepository(

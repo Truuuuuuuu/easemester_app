@@ -150,4 +150,48 @@ class AchievementRepository {
           (s) => (s.data()?['totalCompleted'] ?? 0) as int,
         );
   }
+
+  //TOTAL NOTES CREATED
+  Future<void> incrementNotesCreated(String uid) async {
+    final docRef = firestore
+        .collection('users')
+        .doc(uid)
+        .collection('Achievement')
+        .doc('notesCreated');
+
+    await firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(docRef);
+
+      if (!snapshot.exists) {
+        transaction.set(docRef, {
+          'totalCreated': 1,
+          'history': [DateTime.now()],
+        });
+      } else {
+        final currentTotal =
+            snapshot.get('totalCreated') as int? ?? 0;
+        final history = List.from(
+          snapshot.get('history') ?? [],
+        );
+        history.add(DateTime.now());
+        transaction.update(docRef, {
+          'totalCreated': currentTotal + 1,
+          'history': history,
+        });
+      }
+    });
+  }
+
+  // Stream for total notes created
+  Stream<int> notesCreatedStream(String uid) {
+    return firestore
+        .collection('users')
+        .doc(uid)
+        .collection('Achievement')
+        .doc('notesCreated')
+        .snapshots()
+        .map(
+          (s) => (s.data()?['totalCreated'] ?? 0) as int,
+        );
+  }
 }

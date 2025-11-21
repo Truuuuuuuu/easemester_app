@@ -9,16 +9,15 @@ class AchievementPage extends StatelessWidget {
 
   final AchievementRepository _achievementRepo =
       AchievementRepository(
-        firestore: FirebaseFirestore.instance,
-      );
+    firestore: FirebaseFirestore.instance,
+  );
 
   final Map<String, double> _defaultAchievements = {
     "Files Uploaded": 0,
     "Total Summaries": 0,
     "Completed Quiz": 0,
-    "Completed Tasks": 0,
-    "Notes Created": 0,
     "Generated Flash Cards": 0,
+    "Notes Created": 0, // <<<ADDED>>>
     "Login Streak (Days)": 0,
     "Study Hours Logged": 0,
     "Profile Completed": 0,
@@ -42,36 +41,45 @@ class AchievementPage extends StatelessWidget {
               return StreamBuilder<int>(
                 stream: _achievementRepo.completedQuizStream(uid),
                 builder: (context, completedQuizSnapshot) {
-                  // Start with default values
-                  final achievements = Map<String, double>.from(
-                    _defaultAchievements,
-                  );
+                  return StreamBuilder<int>( // <<<ADDED>>>
+                    stream: _achievementRepo.notesCreatedStream(uid), // <<<ADDED>>>
+                    builder: (context, notesSnapshot) { // <<<ADDED>>>
+                      // Start with default values
+                      final achievements = Map<String, double>.from(
+                        _defaultAchievements,
+                      );
 
-                  // Files Uploaded
-                  achievements["Files Uploaded"] =
-                      filesSnapshot.data?.toDouble() ?? 0;
+                      // Files Uploaded
+                      achievements["Files Uploaded"] =
+                          filesSnapshot.data?.toDouble() ?? 0;
 
-                  // Generated Content
-                  final generated = generatedSnapshot.data ?? {};
-                  achievements["Total Summaries"] =
-                      (generated["totalSummaries"] ?? 0).toDouble();
-                  achievements["Generated Flash Cards"] =
-                      (generated["totalFlashcards"] ?? 0).toDouble();
+                      // Generated Content
+                      final generated = generatedSnapshot.data ?? {};
+                      achievements["Total Summaries"] =
+                          (generated["totalSummaries"] ?? 0).toDouble();
+                      achievements["Generated Flash Cards"] =
+                          (generated["totalFlashcards"] ?? 0).toDouble();
 
-                  // Completed Quiz
-                  achievements["Completed Quiz"] =
-                      completedQuizSnapshot.data?.toDouble() ?? 0;
+                      // Completed Quiz
+                      achievements["Completed Quiz"] =
+                          completedQuizSnapshot.data?.toDouble() ?? 0;
 
-                  return ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: achievements.entries
-                        .map(
-                          (e) => AchievementCard(
-                            title: e.key,
-                            value: e.value,
-                          ),
-                        )
-                        .toList(),
+                      // Notes Created <<<ADDED>>>
+                      achievements["Notes Created"] =
+                          notesSnapshot.data?.toDouble() ?? 0;
+
+                      return ListView(
+                        padding: const EdgeInsets.all(16),
+                        children: achievements.entries
+                            .map(
+                              (e) => AchievementCard(
+                                title: e.key,
+                                value: e.value,
+                              ),
+                            )
+                            .toList(),
+                      );
+                    },
                   );
                 },
               );

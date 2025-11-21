@@ -1,8 +1,10 @@
+import 'package:easemester_app/repositories/achivement_repository.dart';
 import 'package:easemester_app/repositories/notes_repository.dart';
 import 'package:flutter/material.dart';
 import '../models/note_model.dart';
 
 class NotesController extends ChangeNotifier {
+  final AchievementRepository achievementRepository;
   final NotesRepository repository;
   final String uid;
 
@@ -18,6 +20,7 @@ class NotesController extends ChangeNotifier {
   NotesController({
     required this.repository,
     required this.uid,
+    required this.achievementRepository,
   }) {
     _listenToNotes();
   }
@@ -40,6 +43,8 @@ class NotesController extends ChangeNotifier {
       updatedAt: DateTime.now(),
     );
     await repository.addNote(uid, note);
+
+    await achievementRepository.incrementNotesCreated(uid);
   }
 
   // <<<UPDATE>>>
