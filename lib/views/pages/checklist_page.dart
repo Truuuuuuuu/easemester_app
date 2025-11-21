@@ -49,6 +49,10 @@ class ChecklistPageState extends State<ChecklistPage> {
             onPressed: () {
               Navigator.pop(context, dialogController.text);
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white, 
+            ),
             child: const Text('Add'),
           ),
         ],

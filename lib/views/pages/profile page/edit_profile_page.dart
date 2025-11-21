@@ -295,8 +295,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       ? null
                       : saveProfile,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
                         12,
