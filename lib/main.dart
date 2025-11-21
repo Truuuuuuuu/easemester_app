@@ -6,6 +6,7 @@ import 'package:easemester_app/routes/app_routes.dart';
 import 'package:easemester_app/views/auth/login_page.dart';
 import 'package:easemester_app/views/auth/register_page.dart';
 import 'package:easemester_app/views/auth/startup_wrapper.dart';
+import 'package:easemester_app/views/auth/verification_page.dart';
 import 'package:easemester_app/views/pages/notes%20page/addNoteForm_page.dart';
 import 'package:easemester_app/views/pages/profile%20page/edit_profile_page.dart';
 import 'package:easemester_app/views/widget_tree.dart';

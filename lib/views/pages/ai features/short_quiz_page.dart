@@ -292,10 +292,8 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
                               'Correct Answer: ${item['answer']}',
                               style: TextStyle(
                                 color: isCorrect
-                                    ? Colors.green
-                                    : Theme.of(
-                                        context,
-                                      ).colorScheme.error,
+                                    ? Colors.green[800]
+                                    : Colors.green[800],
                                 fontWeight: FontWeight.w500,
                               ),
                             ),

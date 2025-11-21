@@ -1,3 +1,4 @@
+import 'package:easemester_app/views/auth/verification_page.dart';
 import 'package:flutter/material.dart';
 import '../../controllers/auth_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
       TextEditingController();
 
   bool _isLoading = false;
-  bool _isPasswordVisible = false; 
+  bool _isPasswordVisible = false;
 
   Future<void> _login() async {
     final email = _emailController.text.trim();
@@ -37,14 +38,32 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      final user = await _authController.login(
-        email: email,
-        password: password,
-      );
+      // 🔥 MARKED CHANGE: use loginAndCheckVerification instead of login()
+      final user = await _authController
+          .loginAndCheckVerification(
+            email: email,
+            password: password,
+          );
 
-      if (user != null && mounted) {
-        Navigator.pushReplacementNamed(context, '/');
+      if (!mounted) return;
+
+      // 🔥 MARKED CHANGE: user exists but NOT verified
+      if (user == null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => EmailVerificationPage(
+              uid: FirebaseAuth.instance.currentUser!.uid,
+              email: email,
+              name: "User",
+            ),
+          ),
+        );
+        return;
       }
+
+      // 🔥 MARKED CHANGE: Verified → proceed to home
+      Navigator.pushReplacementNamed(context, '/');
     } on FirebaseAuthException catch (e) {
       String message;
 
@@ -139,11 +158,18 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-                      color: theme.iconTheme.color, // icon color adapts
+                      _isPasswordVisible
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      color: theme
+                          .iconTheme
+                          .color, // icon color adapts
                     ),
                     onPressed: () {
-                      setState(() => _isPasswordVisible = !_isPasswordVisible);
+                      setState(
+                        () => _isPasswordVisible =
+                            !_isPasswordVisible,
+                      );
                     },
                   ),
                   filled: true,
@@ -168,7 +194,9 @@ class _LoginPageState extends State<LoginPage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1565C0),
+                    backgroundColor: const Color(
+                      0xFF1565C0,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
                         12,

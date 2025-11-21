@@ -16,22 +16,38 @@ class AuthController {
     required String email,
     required String password,
   }) async {
+    // Only create user in Firebase Auth
     User? user = await _authService.registerUser(
       email: email,
       password: password,
     );
-    if (user != null) {
-      final newUser = UserModel(
-        uid: user.uid,
-        name: name,
-        email: email,
-        profileImageUrl: '',
-      );
-
-      await _firestoreService.saveUser(newUser);
-    }
 
     return user;
+  }
+
+  Future<User?> loginAndCheckVerification({
+    required String email,
+    required String password,
+  }) async {
+    final user = await _authService.loginUser(
+      email: email,
+      password: password,
+    );
+
+    if (user != null) {
+      // Reload to make sure verification status is updated
+      await user.reload();
+      final refreshedUser = _authService.currentUser;
+
+      if (refreshedUser != null &&
+          !refreshedUser.emailVerified) {
+        // User exists in Firebase Auth but NOT verified
+        return null; // Return null so UI knows to redirect
+      }
+
+      return refreshedUser; // Verified user
+    }
+    return null;
   }
 
   // Login

@@ -1,6 +1,7 @@
 import 'package:easemester_app/data/notifiers.dart';
 import 'package:easemester_app/models/profile_model.dart';
 import 'package:easemester_app/services/firestore_service.dart';
+import 'package:easemester_app/views/auth/verification_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../controllers/auth_controller.dart';
@@ -28,7 +29,7 @@ class _RegisterPageState extends State<RegisterPage> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    // Validate name
+    // Validation checks remain the same...
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -37,8 +38,6 @@ class _RegisterPageState extends State<RegisterPage> {
       );
       return;
     }
-
-    // Enforce Gmail-only emails
     if (!RegExp(r'^[\w.+-]+@gmail\.com$').hasMatch(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -49,7 +48,6 @@ class _RegisterPageState extends State<RegisterPage> {
       );
       return;
     }
-    // Enforce strong password: min 6 characters, at least 1 uppercase, 1 number
     if (!RegExp(
       r'^(?=.*[A-Z])(?=.*\d).{6,}$',
     ).hasMatch(password)) {
@@ -73,21 +71,16 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       if (user != null && mounted) {
-        // Build a UserModel right after registration
-        final newUser = UserModel(
-          uid: user.uid,
-          name: name,
-          email: email,
-          profileImageUrl: '', // empty by default
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => EmailVerificationPage(
+              uid: user.uid,
+              name: name,
+              email: email,
+            ),
+          ),
         );
-
-        // Save to Firestore
-        await FirestoreService().saveUser(newUser);
-
-        // Update notifier immediately so AppBar shows correct data
-        currentUserNotifier.value = newUser;
-
-        Navigator.pushReplacementNamed(context, '/home');
       }
     } on FirebaseAuthException catch (e) {
       String message;
