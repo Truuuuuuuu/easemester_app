@@ -1,16 +1,15 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:easemester_app/services/auth_service.dart';
 import 'package:easemester_app/services/firestore_service.dart';
-import 'package:flutter/material.dart';
 import 'package:easemester_app/models/profile_model.dart';
 import 'package:easemester_app/data/notifiers.dart';
 
 class EmailVerificationPage extends StatefulWidget {
-  final String
-  name; // ✅ CHANGED: pass user name from registration
-  final String
-  email; // ✅ CHANGED: pass user email from registration
-  final String uid; // ✅ CHANGED: pass Firebase UID
+  final String name;
+  final String email;
+  final String uid;
+
   const EmailVerificationPage({
     super.key,
     required this.name,
@@ -20,10 +19,10 @@ class EmailVerificationPage extends StatefulWidget {
 
   @override
   State<EmailVerificationPage> createState() =>
-      _EmailVerificationScreenState();
+      _EmailVerificationPageState();
 }
 
-class _EmailVerificationScreenState
+class _EmailVerificationPageState
     extends State<EmailVerificationPage> {
   final AuthService _authService = AuthService();
   bool _isLoading = false;
@@ -33,8 +32,16 @@ class _EmailVerificationScreenState
   @override
   void initState() {
     super.initState();
+    _startEmailVerificationPolling();
+  }
 
-    //Polling for email verification
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startEmailVerificationPolling() {
     _timer = Timer.periodic(const Duration(seconds: 3), (
       timer,
     ) async {
@@ -42,27 +49,25 @@ class _EmailVerificationScreenState
           .isEmailVerified();
       if (isVerified && mounted) {
         timer.cancel();
-
-        // Write to Firestore only AFTER verification
-        final newUser = UserModel(
-          uid: widget.uid,
-          name: widget.name,
-          email: widget.email,
-          profileImageUrl: '',
-        );
-        await FirestoreService().saveUser(newUser);
-
-        currentUserNotifier.value = newUser;
-
-        Navigator.pushReplacementNamed(context, '/home');
+        await _saveVerifiedUser();
+        _navigateToHome();
       }
     });
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+  Future<void> _saveVerifiedUser() async {
+    final newUser = UserModel(
+      uid: widget.uid,
+      name: widget.name,
+      email: widget.email,
+      profileImageUrl: '',
+    );
+    await FirestoreService().saveUser(newUser);
+    currentUserNotifier.value = newUser;
+  }
+
+  void _navigateToHome() {
+    Navigator.pushReplacementNamed(context, '/home');
   }
 
   Future<void> _sendVerificationEmail() async {
@@ -81,25 +86,25 @@ class _EmailVerificationScreenState
       setState(() {
         _message = "Error sending verification email: $e";
       });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Verify Email"),
+        title: const Text("Email Verification"),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(
-              context,
-            ); // ✅ CHANGED: Back to registration page
-          },
+          icon: const Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Center(
@@ -107,38 +112,101 @@ class _EmailVerificationScreenState
             ? const CircularProgressIndicator()
             : Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
+                  horizontal: 24,
                 ),
-                child: Column(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "A verification email has been sent to your email address. "
-                      "Please check your inbox and verify your email before logging in.",
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _sendVerificationEmail,
-                      child: const Text(
-                        "Resend Verification Email",
-                      ),
-                    ),
-                    if (_message != null) ...[
-                      const SizedBox(height: 20),
-                      Text(
-                        _message!,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color:
-                              _message!.startsWith("Error")
-                              ? Colors.red
-                              : Colors.green,
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 72,
+                          height: 72,
+                          child: Image.asset(
+                            'assets/images/icons/gmail_icon.png',
+                            fit: BoxFit.contain,
+                          ),
                         ),
-                      ),
-                    ],
-                  ],
+
+                        const SizedBox(height: 16),
+                        Text(
+                          "Verify Your Email",
+                          style: theme.textTheme.titleLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          "A verification email has been sent to",
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.email,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          onPressed: _isLoading
+                              ? null
+                              : _sendVerificationEmail,
+                          icon: const Icon(Icons.refresh),
+                          label: const Text("Resend Email"),
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor:
+                                const Color.fromARGB(
+                                  255,
+                                  12,
+                                  125,
+                                  216,
+                                ),
+                            minimumSize:
+                                const Size.fromHeight(48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                        if (_message != null) ...[
+                          const SizedBox(height: 16),
+                          Text(
+                            _message!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color:
+                                  _message!.startsWith(
+                                    "Error",
+                                  )
+                                  ? Colors.red
+                                  : Colors.green,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 12),
+                        TextButton(
+                          onPressed: () =>
+                              Navigator.pop(context),
+                          child: const Text(
+                            "Back to Registration",
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
       ),

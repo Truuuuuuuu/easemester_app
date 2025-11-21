@@ -89,6 +89,7 @@ flutter:
   assets:
     - .env
     - assets/images/
+    - assets/images/icons/
     - assets/lottie/
   #  - images/a_dot_ham.jpeg
 
