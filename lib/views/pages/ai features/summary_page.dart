@@ -12,20 +12,35 @@ class SummaryPage extends StatefulWidget {
 }
 
 class _SummaryPageState extends State<SummaryPage> {
-  bool _showSummary = true; // true for summary, false for original
+  bool _showSummary =
+      true; // true for summary, false for original
 
   @override
   Widget build(BuildContext context) {
-    final summaryText = widget.file.aiFeatures?['summary'] ?? "No summary available.";
-    final extractedText = widget.file.fileText ?? "No extracted text found.";
+    final summaryText =
+        widget.file.aiFeatures?['summary'] ??
+        "No summary available.";
+    final extractedText =
+        widget.file.fileText ?? "No extracted text found.";
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.file.fileName, style: AppFonts.heading3),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          widget.file.fileName,
+          style: AppFonts.heading3,
+        ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.primary,
+        foregroundColor: Theme.of(
+          context,
+        ).colorScheme.onPrimary,
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
@@ -39,7 +54,8 @@ class _SummaryPageState extends State<SummaryPage> {
                   ),
                   actions: [
                     TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () =>
+                          Navigator.of(context).pop(),
                       child: const Text('Got it'),
                     ),
                   ],
@@ -55,7 +71,9 @@ class _SummaryPageState extends State<SummaryPage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              Theme.of(
+                context,
+              ).colorScheme.primary.withOpacity(0.1),
               Theme.of(context).colorScheme.surface,
             ],
           ),
@@ -67,9 +85,14 @@ class _SummaryPageState extends State<SummaryPage> {
             children: [
               // Button Section
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.surface,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -80,7 +103,8 @@ class _SummaryPageState extends State<SummaryPage> {
                   ],
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment:
+                      MainAxisAlignment.center,
                   children: [
                     Expanded(
                       child: ElevatedButton(
@@ -91,16 +115,28 @@ class _SummaryPageState extends State<SummaryPage> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _showSummary
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.surface,
+                              ? Theme.of(
+                                  context,
+                                ).colorScheme.primary
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.surface,
                           foregroundColor: _showSummary
-                              ? Theme.of(context).colorScheme.onPrimary
-                              : Theme.of(context).colorScheme.onSurface,
+                              ? Theme.of(
+                                  context,
+                                ).colorScheme.onPrimary
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface,
                           elevation: _showSummary ? 4 : 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius:
+                                BorderRadius.circular(8),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding:
+                              const EdgeInsets.symmetric(
+                                vertical: 12,
+                              ),
                         ),
                         child: const Text('Summary'),
                       ),
@@ -115,16 +151,28 @@ class _SummaryPageState extends State<SummaryPage> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: !_showSummary
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.surface,
+                              ? Theme.of(
+                                  context,
+                                ).colorScheme.primary
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.surface,
                           foregroundColor: !_showSummary
-                              ? Theme.of(context).colorScheme.onPrimary
-                              : Theme.of(context).colorScheme.onSurface,
+                              ? Theme.of(
+                                  context,
+                                ).colorScheme.onPrimary
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.onSurface,
                           elevation: !_showSummary ? 4 : 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius:
+                                BorderRadius.circular(8),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding:
+                              const EdgeInsets.symmetric(
+                                vertical: 12,
+                              ),
                         ),
                         child: const Text('Original'),
                       ),
@@ -137,21 +185,30 @@ class _SummaryPageState extends State<SummaryPage> {
               Expanded(
                 child: SingleChildScrollView(
                   child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
+                    duration: const Duration(
+                      milliseconds: 300,
+                    ),
                     transitionBuilder: (child, animation) =>
-                        FadeTransition(opacity: animation, child: child),
+                        FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        ),
                     child: _showSummary
                         ? _buildContentSection(
                             icon: Icons.summarize,
                             title: "Summary",
                             content: summaryText,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.primary,
                           )
                         : _buildContentSection(
                             icon: Icons.article,
                             title: "Original Text",
                             content: extractedText,
-                            color: Theme.of(context).colorScheme.secondary,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.secondary,
                           ),
                   ),
                 ),
@@ -183,7 +240,9 @@ class _SummaryPageState extends State<SummaryPage> {
           ),
         ],
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+          color: Theme.of(
+            context,
+          ).colorScheme.outline.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -196,7 +255,9 @@ class _SummaryPageState extends State<SummaryPage> {
               const SizedBox(width: 8),
               Text(
                 title,
-                style: AppFonts.heading2.copyWith(color: color),
+                style: AppFonts.heading2.copyWith(
+                  color: color,
+                ),
               ),
             ],
           ),
@@ -204,8 +265,11 @@ class _SummaryPageState extends State<SummaryPage> {
           Text(
             content,
             style: AppFonts.paragraph.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.9),
-              height: 1.5, // Better line height for readability
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withOpacity(0.9),
+              height:
+                  1.5, // Better line height for readability
             ),
           ),
         ],

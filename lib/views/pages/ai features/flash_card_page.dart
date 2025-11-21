@@ -153,6 +153,10 @@ class _FlashcardsPageState extends State<FlashCardPage>
     if (_flashcards.isEmpty) {
       return Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new),
+            onPressed: () => Navigator.pop(context),
+          ),
           title: Text(
             widget.file.fileName,
             style: AppFonts.heading3,
@@ -193,6 +197,10 @@ class _FlashcardsPageState extends State<FlashCardPage>
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new),
+            onPressed: () => Navigator.pop(context),
+          ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Theme.of(

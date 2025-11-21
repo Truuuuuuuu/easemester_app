@@ -42,11 +42,11 @@ class _AddNoteFormPageState extends State<AddNoteFormPage> {
       isDense: true,
       fillColor: isDark
           ? const Color(0xFF2C2C2C) // dark grey
-          : const Color.fromARGB(255, 240, 240, 240), 
+          : const Color.fromARGB(255, 240, 240, 240),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(
-          color: Colors.grey, 
+          color: Colors.grey,
           width: 1.0,
         ),
       ),
@@ -59,6 +59,10 @@ class _AddNoteFormPageState extends State<AddNoteFormPage> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text("Add Note"),
         elevation: 0,
         centerTitle: true,
@@ -116,11 +120,11 @@ class _AddNoteFormPageState extends State<AddNoteFormPage> {
                         12,
                       ),
                     ),
-                    backgroundColor:
-                        Colors.blue,
+                    backgroundColor: Colors.blue,
                   ),
                   label: const Text(
-                    "Save Note", style: TextStyle(
+                    "Save Note",
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,

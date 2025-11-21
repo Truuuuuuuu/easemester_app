@@ -9,8 +9,8 @@ class AchievementPage extends StatelessWidget {
 
   final AchievementRepository _achievementRepo =
       AchievementRepository(
-    firestore: FirebaseFirestore.instance,
-  );
+        firestore: FirebaseFirestore.instance,
+      );
 
   final Map<String, double> _defaultAchievements = {
     "Files Uploaded": 0,
@@ -27,6 +27,10 @@ class AchievementPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text("Achievements"),
         centerTitle: true,
       ),
@@ -34,15 +38,21 @@ class AchievementPage extends StatelessWidget {
         stream: _achievementRepo.filesUploadedStream(uid),
         builder: (context, filesSnapshot) {
           return StreamBuilder<Map<String, dynamic>>(
-            stream: _achievementRepo.generatedContentStream(uid),
+            stream: _achievementRepo.generatedContentStream(
+              uid,
+            ),
             builder: (context, generatedSnapshot) {
               return StreamBuilder<int>(
-                stream: _achievementRepo.completedQuizStream(uid),
+                stream: _achievementRepo
+                    .completedQuizStream(uid),
                 builder: (context, completedQuizSnapshot) {
                   return StreamBuilder<int>(
-                    stream: _achievementRepo.notesCreatedStream(uid),
+                    stream: _achievementRepo
+                        .notesCreatedStream(uid),
                     builder: (context, notesSnapshot) {
-                      return FutureBuilder<DocumentSnapshot>(
+                      return FutureBuilder<
+                        DocumentSnapshot
+                      >(
                         future: FirebaseFirestore.instance
                             .collection('users')
                             .doc(uid)
@@ -50,40 +60,68 @@ class AchievementPage extends StatelessWidget {
                         builder: (context, userSnapshot) {
                           // Start with default values
                           final achievements =
-                              Map<String, double>.from(_defaultAchievements);
+                              Map<String, double>.from(
+                                _defaultAchievements,
+                              );
 
                           // Files Uploaded
                           achievements["Files Uploaded"] =
-                              filesSnapshot.data?.toDouble() ?? 0;
+                              filesSnapshot.data
+                                  ?.toDouble() ??
+                              0;
 
                           // Generated Content
-                          final generated = generatedSnapshot.data ?? {};
+                          final generated =
+                              generatedSnapshot.data ?? {};
                           achievements["Total Summaries"] =
-                              (generated["totalSummaries"] ?? 0).toDouble();
+                              (generated["totalSummaries"] ??
+                                      0)
+                                  .toDouble();
                           achievements["Generated Flash Cards"] =
-                              (generated["totalFlashcards"] ?? 0).toDouble();
+                              (generated["totalFlashcards"] ??
+                                      0)
+                                  .toDouble();
 
                           // Completed Quiz
                           achievements["Completed Quiz"] =
-                              completedQuizSnapshot.data?.toDouble() ?? 0;
+                              completedQuizSnapshot.data
+                                  ?.toDouble() ??
+                              0;
 
                           // Notes Created
                           achievements["Notes Created"] =
-                              notesSnapshot.data?.toDouble() ?? 0;
+                              notesSnapshot.data
+                                  ?.toDouble() ??
+                              0;
 
                           // Profile Progress (0–4)
                           double profileProgress = 0;
-                          if (userSnapshot.hasData && userSnapshot.data!.exists) {
-                            final data = userSnapshot.data!.data() as Map<String, dynamic>;
-                            if ((data['profileImageUrl'] ?? '').isNotEmpty) profileProgress += 1;
-                            if ((data['college'] ?? '').isNotEmpty) profileProgress += 1;
-                            if ((data['course'] ?? '').isNotEmpty) profileProgress += 1;
-                            if ((data['address'] ?? '').isNotEmpty) profileProgress += 1;
+                          if (userSnapshot.hasData &&
+                              userSnapshot.data!.exists) {
+                            final data =
+                                userSnapshot.data!.data()
+                                    as Map<String, dynamic>;
+                            if ((data['profileImageUrl'] ??
+                                    '')
+                                .isNotEmpty)
+                              profileProgress += 1;
+                            if ((data['college'] ?? '')
+                                .isNotEmpty)
+                              profileProgress += 1;
+                            if ((data['course'] ?? '')
+                                .isNotEmpty)
+                              profileProgress += 1;
+                            if ((data['address'] ?? '')
+                                .isNotEmpty)
+                              profileProgress += 1;
                           }
-                          achievements["Profile Progress"] = profileProgress;
+                          achievements["Profile Progress"] =
+                              profileProgress;
 
                           return ListView(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(
+                              16,
+                            ),
                             children: achievements.entries
                                 .map(
                                   (e) => AchievementCard(
