@@ -4,14 +4,21 @@ class AchievementCard extends StatelessWidget {
   final String title;
   final double value;
 
-  const AchievementCard({super.key, required this.title, required this.value});
+  const AchievementCard({
+    super.key,
+    required this.title,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade400, width: 0.5),
+        side: BorderSide(
+          color: Colors.grey.shade400,
+          width: 0.5,
+        ),
       ),
       elevation: 3,
       margin: const EdgeInsets.only(bottom: 16),
@@ -23,27 +30,44 @@ class AchievementCard extends StatelessWidget {
             const SizedBox(width: 16),
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: LinearProgressIndicator(
-                      value: value / 100,
+                      value: title == "Profile Progress"
+                          ? value / 4
+                          : value / 100,
                       minHeight: 10,
-                      color: const Color.fromARGB(255, 25, 90, 165),
+                      color: const Color.fromARGB(
+                        255,
+                        25,
+                        90,
+                        165,
+                      ),
                       backgroundColor: Colors.grey.shade300,
                     ),
                   ),
+
                   const SizedBox(height: 6),
-                  Text("${value.toInt()} / 100",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade700,
-                      )),
+                  Text(
+                    title == "Profile Progress"
+                        ? "${value.toInt()}/4"
+                        : "${value.toInt()} / 100",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -56,23 +80,47 @@ class AchievementCard extends StatelessWidget {
   Icon _buildIcon(String title) {
     switch (title) {
       case "Files Uploaded":
-        return const Icon(Icons.upload_file, color: Colors.purple, size: 36);
+        return const Icon(
+          Icons.upload_file,
+          color: Colors.purple,
+          size: 36,
+        );
       case "Total Summaries":
-        return const Icon(Icons.summarize, color: Colors.orange, size: 36);
+        return const Icon(
+          Icons.summarize,
+          color: Colors.orange,
+          size: 36,
+        );
       case "Generated Flash Cards":
-        return const Icon(Icons.style, color: Colors.pink, size: 36);
+        return const Icon(
+          Icons.style,
+          color: Colors.pink,
+          size: 36,
+        );
       case "Completed Quiz":
-        return const Icon(Icons.quiz, color: Colors.blue, size: 36);
+        return const Icon(
+          Icons.quiz,
+          color: Colors.blue,
+          size: 36,
+        );
       case "Notes Created":
-        return const Icon(Icons.note, color: Colors.amber, size: 36);
-      case "Login Streak (Days)":
-        return const Icon(Icons.local_fire_department, color: Colors.red, size: 36);
-      case "Study Hours Logged":
-        return const Icon(Icons.timer, color: Colors.teal, size: 36);
-      case "Profile Completed":
-        return const Icon(Icons.verified_user, color: Colors.indigo, size: 36);
+        return const Icon(
+          Icons.note,
+          color: Colors.amber,
+          size: 36,
+        );
+      case "Profile Progress":
+        return const Icon(
+          Icons.verified_user,
+          color: Colors.indigo,
+          size: 36,
+        );
       default:
-        return const Icon(Icons.star, color: Colors.grey, size: 36);
+        return const Icon(
+          Icons.star,
+          color: Colors.grey,
+          size: 36,
+        );
     }
   }
 }

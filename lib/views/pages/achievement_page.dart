@@ -17,10 +17,8 @@ class AchievementPage extends StatelessWidget {
     "Total Summaries": 0,
     "Completed Quiz": 0,
     "Generated Flash Cards": 0,
-    "Notes Created": 0, // <<<ADDED>>>
-    "Login Streak (Days)": 0,
-    "Study Hours Logged": 0,
-    "Profile Completed": 0,
+    "Notes Created": 0,
+    "Profile Progress": 0,
   };
 
   @override
@@ -41,43 +39,61 @@ class AchievementPage extends StatelessWidget {
               return StreamBuilder<int>(
                 stream: _achievementRepo.completedQuizStream(uid),
                 builder: (context, completedQuizSnapshot) {
-                  return StreamBuilder<int>( // <<<ADDED>>>
-                    stream: _achievementRepo.notesCreatedStream(uid), // <<<ADDED>>>
-                    builder: (context, notesSnapshot) { // <<<ADDED>>>
-                      // Start with default values
-                      final achievements = Map<String, double>.from(
-                        _defaultAchievements,
-                      );
+                  return StreamBuilder<int>(
+                    stream: _achievementRepo.notesCreatedStream(uid),
+                    builder: (context, notesSnapshot) {
+                      return FutureBuilder<DocumentSnapshot>(
+                        future: FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(uid)
+                            .get(),
+                        builder: (context, userSnapshot) {
+                          // Start with default values
+                          final achievements =
+                              Map<String, double>.from(_defaultAchievements);
 
-                      // Files Uploaded
-                      achievements["Files Uploaded"] =
-                          filesSnapshot.data?.toDouble() ?? 0;
+                          // Files Uploaded
+                          achievements["Files Uploaded"] =
+                              filesSnapshot.data?.toDouble() ?? 0;
 
-                      // Generated Content
-                      final generated = generatedSnapshot.data ?? {};
-                      achievements["Total Summaries"] =
-                          (generated["totalSummaries"] ?? 0).toDouble();
-                      achievements["Generated Flash Cards"] =
-                          (generated["totalFlashcards"] ?? 0).toDouble();
+                          // Generated Content
+                          final generated = generatedSnapshot.data ?? {};
+                          achievements["Total Summaries"] =
+                              (generated["totalSummaries"] ?? 0).toDouble();
+                          achievements["Generated Flash Cards"] =
+                              (generated["totalFlashcards"] ?? 0).toDouble();
 
-                      // Completed Quiz
-                      achievements["Completed Quiz"] =
-                          completedQuizSnapshot.data?.toDouble() ?? 0;
+                          // Completed Quiz
+                          achievements["Completed Quiz"] =
+                              completedQuizSnapshot.data?.toDouble() ?? 0;
 
-                      // Notes Created <<<ADDED>>>
-                      achievements["Notes Created"] =
-                          notesSnapshot.data?.toDouble() ?? 0;
+                          // Notes Created
+                          achievements["Notes Created"] =
+                              notesSnapshot.data?.toDouble() ?? 0;
 
-                      return ListView(
-                        padding: const EdgeInsets.all(16),
-                        children: achievements.entries
-                            .map(
-                              (e) => AchievementCard(
-                                title: e.key,
-                                value: e.value,
-                              ),
-                            )
-                            .toList(),
+                          // Profile Progress (0–4)
+                          double profileProgress = 0;
+                          if (userSnapshot.hasData && userSnapshot.data!.exists) {
+                            final data = userSnapshot.data!.data() as Map<String, dynamic>;
+                            if ((data['profileImageUrl'] ?? '').isNotEmpty) profileProgress += 1;
+                            if ((data['college'] ?? '').isNotEmpty) profileProgress += 1;
+                            if ((data['course'] ?? '').isNotEmpty) profileProgress += 1;
+                            if ((data['address'] ?? '').isNotEmpty) profileProgress += 1;
+                          }
+                          achievements["Profile Progress"] = profileProgress;
+
+                          return ListView(
+                            padding: const EdgeInsets.all(16),
+                            children: achievements.entries
+                                .map(
+                                  (e) => AchievementCard(
+                                    title: e.key,
+                                    value: e.value,
+                                  ),
+                                )
+                                .toList(),
+                          );
+                        },
                       );
                     },
                   );

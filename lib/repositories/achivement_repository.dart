@@ -194,4 +194,51 @@ class AchievementRepository {
           (s) => (s.data()?['totalCreated'] ?? 0) as int,
         );
   }
+
+  //PROFILE PROGRESS
+  Stream<int> profileProgressStream(String uid) {
+    return firestore
+        .collection('users')
+        .doc(uid)
+        .snapshots()
+        .map((snapshot) {
+          final data = snapshot.data() ?? {};
+          int progress = 0;
+
+          // Profile photo
+          if (data['profileImageUrl'] != null &&
+              data['profileImageUrl']
+                  .toString()
+                  .trim()
+                  .isNotEmpty) {
+            progress += 1;
+          }
+
+          // College
+          if (data['college'] != null &&
+              data['college']
+                  .toString()
+                  .trim()
+                  .isNotEmpty) {
+            progress += 1;
+          }
+
+          // Course
+          if (data['course'] != null &&
+              data['course'].toString().trim().isNotEmpty) {
+            progress += 1;
+          }
+
+          // Address
+          if (data['address'] != null &&
+              data['address']
+                  .toString()
+                  .trim()
+                  .isNotEmpty) {
+            progress += 1;
+          }
+
+          return progress; 
+        });
+  }
 }
