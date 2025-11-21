@@ -7,7 +7,6 @@ import 'package:easemester_app/views/pages/achievement_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easemester_app/views/widgets/app_drawer.dart';
-import 'package:easemester_app/data/constant.dart'; // ✅ For AppFonts
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -297,7 +296,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             const SizedBox(height: 16),
 
                             _buildInfoTile(
-                              icon: Icons.school,
+                              iconPath:
+                                  'assets/images/icons/graduation_icon.png',
                               title: "College/University",
                               subtitle: college.isNotEmpty
                                   ? college
@@ -306,7 +306,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             const SizedBox(height: 24),
 
                             _buildInfoTile(
-                              icon: Icons.menu_book,
+                              iconPath:
+                                  'assets/images/icons/course_icon.png',
                               title: "Course",
                               subtitle: course.isNotEmpty
                                   ? course
@@ -315,7 +316,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             const SizedBox(height: 24),
 
                             _buildInfoTile(
-                              icon: Icons.location_on,
+                              iconPath:
+                                  'assets/images/icons/location_icon.png',
                               title: "Address",
                               subtitle: address.isNotEmpty
                                   ? address
@@ -357,22 +359,20 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // Updated _buildInfoTile to accept a PNG icon
   Widget _buildInfoTile({
-    required IconData icon,
+    required String iconPath, // path to PNG
     required String title,
     required String subtitle,
   }) {
     return Row(
       children: [
-        CircleAvatar(
-          backgroundColor: Theme.of(
-            context,
-          ).colorScheme.primary.withOpacity(0.1),
-          child: Icon(
-            icon,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+        SizedBox(
+          width: 40,
+          height: 40,
+          child: Image.asset(iconPath, fit: BoxFit.contain),
         ),
+
         const SizedBox(width: 16),
         Expanded(
           child: Column(

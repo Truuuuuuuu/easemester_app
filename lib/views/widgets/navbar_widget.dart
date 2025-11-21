@@ -38,7 +38,7 @@ class NavbarWidget extends StatelessWidget {
             child: Container(
               width: 50,
               height: 50,
-              decoration: BoxDecoration(
+              decoration: BoxDecoration(  
                 shape: BoxShape.circle,
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
