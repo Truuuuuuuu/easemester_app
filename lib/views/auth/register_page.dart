@@ -117,297 +117,329 @@ class _RegisterPageState extends State<RegisterPage> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: theme
-          .scaffoldBackgroundColor, 
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 48,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Create Account",
-                style: TextStyle(
-                  fontSize: 38,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1565C0),
-                ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 48,
               ),
-              const SizedBox(height: 2),
-              Text(
-                "Sign up to continue",
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface
-                      .withOpacity(
-                        0.7,
-                      ), // ✅ Theme-aware secondary text
-                  fontSize: 16,
+              physics:
+                  const AlwaysScrollableScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
                 ),
-              ),
-              const SizedBox(height: 32),
-
-              // NAME TEXTFIELD
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Full Name',
-                  labelStyle: TextStyle(
-                    color: isDark
-                        ? Colors.grey[400]
-                        : Colors.grey[600],
-                  ),
-                  floatingLabelStyle: const TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Image.asset(
-                      'assets/images/icons/profile_icon.png',
-                      width: 24,
-                      height: 24,
-                    ),
-                  ),
-                  filled: true,
-                  fillColor: isDark
-                      ? Colors.grey[850]
-                      : Colors.grey[100],
-
-                  // Default border
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: isDark
-                          ? Colors.grey[700]!
-                          : Colors.grey[300]!,
-                      width: 1.5,
-                    ),
-                  ),
-
-                  // Non-focused border
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: isDark
-                          ? Colors.grey[700]!
-                          : Colors.grey[300]!,
-                      width: 1.5,
-                    ),
-                  ),
-
-                  // Focused border
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(12),
-                    ),
-                    borderSide: BorderSide(
-                      color: Colors.blue,
-                      width: 2,
-                    ),
-                  ),
-                ),
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Email
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  labelStyle: TextStyle(
-                    color: isDark
-                        ? Colors.grey[400]
-                        : Colors.grey[600],
-                  ),
-                  floatingLabelStyle: const TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Image.asset(
-                      'assets/images/icons/email_icon.png',
-                      width: 24,
-                      height: 24,
-                    ),
-                  ),
-                  filled: true,
-                  fillColor: isDark
-                      ? Colors.grey[850]
-                      : Colors.grey[100],
-
-                  // Default border
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: isDark
-                          ? Colors.grey[700]!
-                          : Colors.grey[300]!,
-                      width: 1.5,
-                    ),
-                  ),
-
-                  // Not focused border
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: isDark
-                          ? Colors.grey[700]!
-                          : Colors.grey[300]!,
-                      width: 1.5,
-                    ),
-                  ),
-
-                  // Focused (active) border
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(12),
-                    ),
-                    borderSide: BorderSide(
-                      color: Colors.blue,
-                      width: 2,
-                    ),
-                  ),
-                ),
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Password
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  labelStyle: TextStyle(
-                    color: isDark
-                        ? Colors.grey[400]
-                        : Colors.grey[600],
-                  ),
-                  floatingLabelStyle: const TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Image.asset(
-                      'assets/images/icons/password_icon.png',
-                      width: 24,
-                      height: 24,
-                    ),
-                  ),
-                  filled: true,
-                  fillColor: isDark
-                      ? Colors.grey[850]
-                      : Colors.grey[100],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: isDark
-                          ? Colors.grey[700]!
-                          : Colors.grey[300]!,
-                      width: 1.5,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: isDark
-                          ? Colors.grey[700]!
-                          : Colors.grey[300]!,
-                      width: 1.5,
-                    ),
-                  ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(12),
-                    ),
-                    borderSide: BorderSide(
-                      color: Colors.blue,
-                      width: 2,
-                    ),
-                  ),
-                ),
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Register button
-              SizedBox(
-                width: width,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _register,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:  Color(0xFF1565C0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        12,
-                      ),
-                    ),
-                  ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(
-                          color: Colors.white,
-                        )
-                      : Text(
-                          "Register",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white, // ✅ Theme-aware button text color
-                          ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    mainAxisAlignment:
+                        MainAxisAlignment.center,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Create Account",
+                        style: TextStyle(
+                          fontSize: 38,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF1565C0),
                         ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        "Sign up to continue",
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface
+                              .withOpacity(0.7),
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+
+                      // NAME TEXTFIELD
+                      TextField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          labelText: 'Full Name',
+                          labelStyle: TextStyle(
+                            color: isDark
+                                ? Colors.grey[400]
+                                : Colors.grey[600],
+                          ),
+                          floatingLabelStyle:
+                              const TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.w600,
+                              ),
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.all(
+                              12.0,
+                            ),
+                            child: Image.asset(
+                              'assets/images/icons/profile_icon.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: isDark
+                              ? Colors.grey[850]
+                              : Colors.grey[100],
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: isDark
+                                  ? Colors.grey[700]!
+                                  : Colors.grey[300]!,
+                              width: 1.5,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: isDark
+                                  ? Colors.grey[700]!
+                                  : Colors.grey[300]!,
+                              width: 1.5,
+                            ),
+                          ),
+                          focusedBorder:
+                              const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(
+                                      Radius.circular(12),
+                                    ),
+                                borderSide: BorderSide(
+                                  color: Colors.blue,
+                                  width: 2,
+                                ),
+                              ),
+                        ),
+                        style: TextStyle(
+                          color:
+                              theme.colorScheme.onSurface,
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Email TextField
+                      TextField(
+                        controller: _emailController,
+                        keyboardType:
+                            TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          labelStyle: TextStyle(
+                            color: isDark
+                                ? Colors.grey[400]
+                                : Colors.grey[600],
+                          ),
+                          floatingLabelStyle:
+                              const TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.w600,
+                              ),
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.all(
+                              12.0,
+                            ),
+                            child: Image.asset(
+                              'assets/images/icons/email_icon.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: isDark
+                              ? Colors.grey[850]
+                              : Colors.grey[100],
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: isDark
+                                  ? Colors.grey[700]!
+                                  : Colors.grey[300]!,
+                              width: 1.5,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: isDark
+                                  ? Colors.grey[700]!
+                                  : Colors.grey[300]!,
+                              width: 1.5,
+                            ),
+                          ),
+                          focusedBorder:
+                              const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(
+                                      Radius.circular(12),
+                                    ),
+                                borderSide: BorderSide(
+                                  color: Colors.blue,
+                                  width: 2,
+                                ),
+                              ),
+                        ),
+                        style: TextStyle(
+                          color:
+                              theme.colorScheme.onSurface,
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Password TextField
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          labelStyle: TextStyle(
+                            color: isDark
+                                ? Colors.grey[400]
+                                : Colors.grey[600],
+                          ),
+                          floatingLabelStyle:
+                              const TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.w600,
+                              ),
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.all(
+                              12.0,
+                            ),
+                            child: Image.asset(
+                              'assets/images/icons/password_icon.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: isDark
+                              ? Colors.grey[850]
+                              : Colors.grey[100],
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: isDark
+                                  ? Colors.grey[700]!
+                                  : Colors.grey[300]!,
+                              width: 1.5,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(12),
+                            borderSide: BorderSide(
+                              color: isDark
+                                  ? Colors.grey[700]!
+                                  : Colors.grey[300]!,
+                              width: 1.5,
+                            ),
+                          ),
+                          focusedBorder:
+                              const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(
+                                      Radius.circular(12),
+                                    ),
+                                borderSide: BorderSide(
+                                  color: Colors.blue,
+                                  width: 2,
+                                ),
+                              ),
+                        ),
+                        style: TextStyle(
+                          color:
+                              theme.colorScheme.onSurface,
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      // Register button
+                      SizedBox(
+                        width: width,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _isLoading
+                              ? null
+                              : _register,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(
+                              0xFF1565C0,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: _isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text(
+                                  "Register",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight:
+                                        FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      Row(
+                        mainAxisAlignment:
+                            MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Already have an account?",
+                            style: TextStyle(
+                              color: theme
+                                  .colorScheme
+                                  .onSurface,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                context,
+                                '/login',
+                              );
+                            },
+                            child: Text(
+                              "Sign In",
+                              style: TextStyle(
+                                color: theme
+                                    .colorScheme
+                                    .primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 16),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Already have an account?",
-                    style: TextStyle(
-                      color: theme
-                          .colorScheme
-                          .onSurface, // ✅ Theme-aware text color
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        '/login',
-                      );
-                    },
-                    child: Text(
-                      "Sign In",
-                      style: TextStyle(
-                        color: theme
-                            .colorScheme
-                            .primary, // ✅ Theme-aware link color
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

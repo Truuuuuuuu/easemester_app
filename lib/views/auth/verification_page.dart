@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:easemester_app/services/auth_service.dart';
 import 'package:easemester_app/services/firestore_service.dart';
@@ -82,9 +83,15 @@ class _EmailVerificationPageState
         _message =
             "Verification email sent! Please check your inbox.";
       });
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
       setState(() {
-        _message = "Error sending verification email: $e";
+        if (e.code == 'too-many-requests') {
+          _message =
+              "You've requested verification too many times. Please try again later.";
+        } else {
+          _message =
+              "Error sending verification email: ${e.message}";
+        }
       });
     } finally {
       if (mounted) {
@@ -188,9 +195,16 @@ class _EmailVerificationPageState
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color:
-                                  _message!.startsWith(
-                                    "Error",
-                                  )
+                                  _message!
+                                          .toLowerCase()
+                                          .contains(
+                                            "error",
+                                          ) ||
+                                      _message!
+                                          .toLowerCase()
+                                          .contains(
+                                            "too many",
+                                          )
                                   ? Colors.red
                                   : Colors.green,
                             ),
