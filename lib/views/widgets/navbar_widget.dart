@@ -9,13 +9,54 @@ class NavbarWidget extends StatelessWidget {
     return ValueListenableBuilder<int>(
       valueListenable: selectedPageNotifier,
       builder: (context, selectedPage, child) {
-        Color iconColor(int index) {
-          return selectedPage == index
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).iconTheme.color!;
-        }
-
         final bool showFab = selectedPage != 3;
+
+        // Map for icon paths (normal and selected)
+        final icons = [
+          {
+            'default': 'assets/images/icons/home_icon.png',
+            'selected': 'assets/images/icons/home_icon.png',
+          },
+          {
+            'default': 'assets/images/icons/notes_icon.png',
+            'selected': 'assets/images/icons/notes_icon.png',
+          },
+          {
+            'default': 'assets/images/icons/checklist_icon.png',
+            'selected': 'assets/images/icons/checklist_icon.png',
+          },
+          {
+            'default': 'assets/images/icons/profile_icon.png',
+            'selected': 'assets/images/icons/profile_icon.png',
+          },
+        ];
+
+        Widget navItem(int index) {
+          final isSelected = selectedPage == index;
+          return GestureDetector(
+            onTap: () => selectedPageNotifier.value = index,
+            child: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+                    : Colors.transparent,
+              ),
+              child: Center(
+                child: Image.asset(
+                  isSelected
+                      ? icons[index]['selected']!
+                      : icons[index]['default']!,
+                  width: 30,
+                  height: 30,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          );
+        }
 
         return Stack(
           alignment: Alignment.bottomCenter,
@@ -33,55 +74,17 @@ class NavbarWidget extends StatelessWidget {
                 child: SizedBox(
                   height: 60,
                   child: Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.home,
-                          color: iconColor(0),
-                          size: 30,
-                        ),
-                        onPressed: () =>
-                            selectedPageNotifier.value = 0,
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.sticky_note_2,
-                          color: iconColor(1),
-                          size: 30,
-                        ),
-                        onPressed: () =>
-                            selectedPageNotifier.value = 1,
-                      ),
-
-                      //only part that animates
+                      navItem(0),
+                      navItem(1),
                       AnimatedContainer(
-                        duration: const Duration(
-                          milliseconds: 300,
-                        ),
+                        duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
                         width: showFab ? 60 : 0,
                       ),
-
-                      IconButton(
-                        icon: Icon(
-                          Icons.checklist,
-                          color: iconColor(2),
-                          size: 30,
-                        ),
-                        onPressed: () =>
-                            selectedPageNotifier.value = 2,
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.person,
-                          color: iconColor(3),
-                          size: 30,
-                        ),
-                        onPressed: () =>
-                            selectedPageNotifier.value = 3,
-                      ),
+                      navItem(2),
+                      navItem(3),
                     ],
                   ),
                 ),
