@@ -27,7 +27,7 @@ class OpenAIService {
             {
               "role": "system",
               "content":
-                  "You are a helpful assistant that summarizes text clearly and concisely.",
+                  "You are a helpful assistant that summarizes text in a way that students can fully understand. Include key concepts, explanations, and examples if necessary. Make it detailed but clear.",
             },
             {
               "role": "user",
@@ -57,9 +57,7 @@ class OpenAIService {
   }
 
   /// Generate a short quiz (question + answer pairs)
-  Future<List<Map<String, String>>> generateShortQuiz(
-    String text,
-  ) async {
+  Future<List<Map<String, String>>> generateShortQuiz(String text) async {
     print("🚀 Generating short quiz...");
     try {
       final response = await http.post(
@@ -69,39 +67,46 @@ class OpenAIService {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          "model": "gpt-4o-mini",
+          "model": "gpt-4o",
           "messages": [
             {
               "role": "system",
               "content": """
-You are a helpful tutor. Based on the input text, generate exactly 5 short quiz questions with their correct answers.
-Respond *only* in pure JSON (no markdown or text outside the JSON), in this exact format:
+You are a helpful tutor. Ignore any instructor or university info. 
+Generate exactly 10 identification quiz questions from the input text. 
+Each answer must be **short and concise**, preferably a **single word or phrase**, not a full sentence. 
+Respond ONLY with valid JSON in this exact format:
+
 [
-  {"question": "...", "answer": "..."},
-  {"question": "...", "answer": "..."}
+  {"question": "Question 1", "answer": "Answer 1"},
+  {"question": "Question 2", "answer": "Answer 2"}
 ]
-""",
+
+Do NOT include markdown, backticks, or extra text. Escape any quotes inside values.
+"""
             },
             {"role": "user", "content": text},
           ],
-          "max_tokens": 600,
+          "max_completion_tokens": 700,
         }),
       );
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
-        String content =
-            decoded['choices'][0]['message']['content']
-                .trim();
+        String content = decoded['choices'][0]['message']['content'].trim();
 
-        // 🧹 Remove ```json or ``` if present
-        content = content
-            .replaceAll(RegExp(r'```(json)?'), '')
-            .trim();
+        // Remove code fences if present
+        content = content.replaceAll(RegExp(r'```(json)?'), '').trim();
 
-        print("📘 Cleaned quiz output: $content");
+        // Empty response check
+        if (content.isEmpty) {
+          print("⚠️ Empty API response");
+          return [
+            {'question': 'Error', 'answer': 'API returned empty response'}
+          ];
+        }
 
-        // ✅ Try parsing JSON array
+        // Try parsing JSON
         try {
           final List<dynamic> parsed = jsonDecode(content);
           final quizList = parsed
@@ -112,46 +117,30 @@ Respond *only* in pure JSON (no markdown or text outside the JSON), in this exac
                 },
               )
               .toList();
-
           print("✅ Parsed ${quizList.length} quiz items.");
           return quizList;
         } catch (err) {
           print("⚠️ JSON parse failed: $err");
-          // Return fallback if parsing failed
           return [
-            {
-              'question':
-                  'Quiz could not be parsed properly.',
-              'answer': content,
-            },
+            {'question': 'Quiz parse error', 'answer': content}
           ];
         }
       } else {
-        print(
-          "❌ API Error ${response.statusCode}: ${response.body}",
-        );
+        print("❌ API Error ${response.statusCode}: ${response.body}");
         return [
-          {
-            'question': 'Error fetching quiz.',
-            'answer': response.body,
-          },
+          {'question': 'API Error', 'answer': response.body}
         ];
       }
     } catch (e) {
       print("❌ Exception in generateShortQuiz: $e");
       return [
-        {
-          'question': 'Exception occurred.',
-          'answer': e.toString(),
-        },
+        {'question': 'Exception', 'answer': e.toString()}
       ];
     }
   }
 
   /// Generate flashcards (term + definition pairs)
-  Future<List<Map<String, String>>> generateFlashcards(
-    String text,
-  ) async {
+  Future<List<Map<String, String>>> generateFlashcards(String text) async {
     print("📘 Generating flashcards...");
     try {
       final response = await http.post(
@@ -161,46 +150,45 @@ Respond *only* in pure JSON (no markdown or text outside the JSON), in this exac
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          "model": "gpt-4o-mini",
+          "model": "gpt-4o",
           "messages": [
             {
               "role": "system",
-              "content":
-                  "You are a helpful assistant that creates flashcards from provided text.",
-            },
-            {
-              "role": "user",
-              "content":
-                  """
-Create 5 flashcards from the text below. Respond ONLY with a JSON array in this exact format (no markdown, no extra text):
+              "content": """
+You are a helpful assistant that creates 10 educational flashcards from the text.
+Ignore instructor/university info. Focus only on key concepts and definitions.
+Respond ONLY in valid JSON like this:
 
 [
   {"term": "Term 1", "definition": "Definition 1"},
   {"term": "Term 2", "definition": "Definition 2"}
 ]
 
-Text:
-$text
-""",
+Do NOT include markdown, backticks, or extra text. Escape quotes inside values.
+"""
             },
+            {"role": "user", "content": text},
           ],
-          "max_tokens": 400,
+          "max_completion_tokens": 800,
         }),
       );
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
-        String content =
-            decoded['choices'][0]['message']['content']
-                .toString()
-                .trim();
+        String content = decoded['choices'][0]['message']['content'].trim();
 
-        // Remove triple-backtick fences if present
-        content = content
-            .replaceAll(RegExp(r'```(json)?'), '')
-            .trim();
+        // Remove code fences
+        content = content.replaceAll(RegExp(r'```(json)?'), '').trim();
 
-        // Try parse
+        // Empty response check
+        if (content.isEmpty) {
+          print("⚠️ Empty API response");
+          return [
+            {'term': 'Error', 'definition': 'API returned empty response'}
+          ];
+        }
+
+        // Parse JSON safely
         try {
           final List<dynamic> parsed = jsonDecode(content);
           final flashcards = parsed
@@ -211,34 +199,24 @@ $text
                 },
               )
               .toList();
-          print(
-            "✅ Parsed ${flashcards.length} flashcards.",
-          );
+          print("✅ Parsed ${flashcards.length} flashcards.");
           return flashcards;
         } catch (err) {
-          print("⚠️ Failed to parse flashcards JSON: $err");
+          print("⚠️ JSON parse failed: $err");
           return [
-            {
-              'term': 'Flashcards parse error',
-              'definition': content,
-            },
+            {'term': 'Flashcards parse error', 'definition': content}
           ];
         }
       } else {
-        print(
-          "❌ API Error ${response.statusCode}: ${response.body}",
-        );
+        print("❌ API Error ${response.statusCode}: ${response.body}");
         return [
-          {
-            'term': 'API Error',
-            'definition': response.body,
-          },
+          {'term': 'API Error', 'definition': response.body}
         ];
       }
     } catch (e) {
       print("❌ Exception in generateFlashcards: $e");
       return [
-        {'term': 'Exception', 'definition': e.toString()},
+        {'term': 'Exception', 'definition': e.toString()}
       ];
     }
   }

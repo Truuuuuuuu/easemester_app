@@ -88,3 +88,4 @@ The overlap occurs because ProfilePage is the ONLY page that:
 
 The fix requires manually handling SafeArea for the nested AppBar.
 
+
