@@ -39,11 +39,13 @@ class CustomFAB extends StatelessWidget {
               // Study Hub tab → add file to Study Hub subcollection
               await homeController.pickAndUploadFile(
                 isStudyHub: true,
+                context: context,
               );
             } else if (tabIndex == 1) {
               // Files tab → add file to Files tab subcollection
               await homeController.pickAndUploadFile(
                 isStudyHub: false,
+                context: context,
               );
             }
           });

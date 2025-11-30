@@ -67,6 +67,7 @@ class HomeController extends ChangeNotifier {
   /// Pick and upload file (metadata only for both StudyHub and Files)
   Future<void> pickAndUploadFile({
     required bool isStudyHub,
+    required BuildContext context,
   }) async {
     try {
       final result = await FilePicker.platform.pickFiles(
@@ -74,6 +75,28 @@ class HomeController extends ChangeNotifier {
         allowedExtensions: ['pdf', 'docx', 'txt'],
       );
       if (result == null || result.files.isEmpty) return;
+
+      /* FILE SIZE UPLOAD LIMIT */
+      final fileSize = result
+          .files
+          .first
+          .size;
+      const maxSize =
+          10 * 1024 * 1024; 
+
+      if (fileSize > maxSize) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "File too large. Maximum allowed size is 10MB.",
+            ),
+            backgroundColor: Color.fromARGB(255, 234, 113, 113),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return; // stop upload
+      }
+
       final path = result.files.first.path;
       if (path == null) return;
       final file = File(path);
