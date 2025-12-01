@@ -291,4 +291,36 @@ class HomeController extends ChangeNotifier {
       );
     }
   }
+
+  
+  // ----------------------------
+  // ✅ Add these new refresh methods
+  // ----------------------------
+  
+  /// Fetch the latest StudyHub files from Firestore and update local state
+  Future<void> loadStudyHubCards() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final items = await _fileRepository.studyHubFilesOnce(uid); // implement a one-time fetch in repo
+    studyHubCards = items;
+    notifyListeners();
+  }
+
+  /// Fetch the latest Files tab files from Firestore and update local state
+  Future<void> loadFilesCards() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final items = await _fileRepository.filesTabFilesOnce(uid); // implement a one-time fetch in repo
+    filesCards = items;
+    notifyListeners();
+  }
+
+  /// Public refresh methods for RefreshIndicator
+  Future<void> refreshStudyHub() async {
+    await loadStudyHubCards();
+  }
+
+  Future<void> refreshFiles() async {
+    await loadFilesCards();
+  }
+
+  
 }

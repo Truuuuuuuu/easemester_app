@@ -8,9 +8,8 @@ class FileCardModel {
   final String? description;
   final String? fileText;
   final Map<String, dynamic>? aiFeatures;
-  final String? studyHubFileId; // Reference to the StudyHub file ID
+  final String? studyHubFileId;
   final String publicId;
- 
 
   FileCardModel({
     required this.id,
@@ -22,8 +21,22 @@ class FileCardModel {
     this.aiFeatures,
     this.studyHubFileId,
     required this.publicId,
-
   });
+  // ✅ Factory constructor to create FileCardModel from Firestore document
+  factory FileCardModel.fromDoc(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>? ?? {};
+    return FileCardModel(
+      id: doc.id,
+      fileName: data['fileName'] ?? '',
+      fileUrl: data['fileUrl'] ?? '',
+      publicId: data['publicId'] ?? '',
+      description: data['description'],
+      fileText: data['fileText'],
+      aiFeatures: data['aiFeatures'] != null
+          ? Map<String, dynamic>.from(data['aiFeatures'])
+          : null,
+    );
+  }
 
   // Convert Firestore document to FileCardModel
   factory FileCardModel.fromMap(
@@ -49,7 +62,6 @@ class FileCardModel {
           : null,
       studyHubFileId: data['studyHubFileId'],
       publicId: data['publicId'],
-  
     );
   }
 
@@ -63,7 +75,6 @@ class FileCardModel {
       'description': description,
       'fileText': fileText,
       'publicId': publicId,
-
     };
 
     if (aiFeatures != null) {
@@ -73,7 +84,6 @@ class FileCardModel {
     if (studyHubFileId != null) {
       map['studyHubFileId'] = studyHubFileId;
     }
-
 
     return map;
   }
@@ -98,7 +108,6 @@ class FileCardModel {
       aiFeatures: aiFeatures ?? this.aiFeatures,
       studyHubFileId: studyHubFileId ?? this.studyHubFileId,
       publicId: publicId ?? this.publicId,
- 
     );
   }
 }

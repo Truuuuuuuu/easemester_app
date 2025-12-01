@@ -16,6 +16,7 @@ class HomePage extends StatelessWidget {
   final HomeController controller;
 
   const HomePage({super.key, required this.controller});
+  
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,7 @@ class HomePage extends StatelessWidget {
             Container(
               margin: const EdgeInsets.all(12),
               child: Card(
-                color: Color.fromARGB(255, 9, 35, 64), 
+                color: Color.fromARGB(255, 9, 35, 64),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
@@ -75,193 +76,39 @@ class HomePage extends StatelessWidget {
                 controller: controller.tabController,
                 children: [
                   // Study Hub tab (files with AI features)
-                  GridView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount:
-                        controller.studyHubCards.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.8,
-                        ),
-                    itemBuilder: (context, index) {
-                      final file = controller
-                          .studyHubCards[index]; // FileCardModel
-                      return StudyCard(
-                        file: file,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  FeaturePage(file: file, isStudyHub: true),
-                            ),
-                          );
-                        },
-
-                        onLongPress: () {
-                          confirmDeleteFile(
-                            context,
-                            controller,
-                            file,
-                          );
-                        },
-                      );
+                  RefreshIndicator(
+                    onRefresh: () async {
+                      await controller
+                          .refreshStudyHub(); // create this async method
                     },
-                  ),
-
-                  // Files tab (normal files)
-                  ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: controller.filesCards.length,
-                    itemBuilder: (context, index) {
-                      final file =
-                          controller.filesCards[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(
-                          bottom: 12,
-                        ),
-                        child: FileCardWidget(
-                          fileCard: file,
-                          onTap: () async {
-                            final url = file.fileUrl;
-                            final isTxt = url
-                                .toLowerCase()
-                                .endsWith('.txt');
-
-                            showModalBottomSheet(
-                              context: context,
-                              builder: (_) => SafeArea(
-                                child: Wrap(
-                                  children: [
-                                    if (isTxt)
-                                      ListTile(
-                                        leading: const Icon(
-                                          Icons
-                                              .description_outlined,
-                                        ),
-                                        title: const Text(
-                                          'View in app (TXT)',
-                                        ),
-                                        onTap: () {
-                                          Navigator.pop(
-                                            context,
-                                          );
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                                  FileViewerPage(
-                                                    fileUrl:
-                                                        url,
-                                                    fileName:
-                                                        file.fileName,
-                                                  ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ListTile(
-                                      leading: const Icon(
-                                        Icons.open_in_new,
-                                      ),
-                                      title: const Text(
-                                        'Open with another app',
-                                      ),
-                                      onTap: () async {
-                                        Navigator.pop(
-                                          context,
-                                        );
-                                        try {
-                                          // Show a simple loading dialog while downloading
-                                          showDialog(
-                                            context:
-                                                context,
-                                            barrierDismissible:
-                                                false,
-                                            builder: (_) =>
-                                                const Center(
-                                                  child:
-                                                      CircularProgressIndicator(),
-                                                ),
-                                          );
-                                          // Download to temp
-                                          final response =
-                                              await http.get(
-                                                Uri.parse(
-                                                  url,
-                                                ),
-                                              );
-                                          final tempDir =
-                                              await getTemporaryDirectory();
-                                          final fileName =
-                                              url
-                                                  .split(
-                                                    '/',
-                                                  )
-                                                  .last
-                                                  .split(
-                                                    '?',
-                                                  )
-                                                  .first;
-                                          final filePath =
-                                              '${tempDir.path}/$fileName';
-                                          final f = File(
-                                            filePath,
-                                          );
-                                          await f.writeAsBytes(
-                                            response
-                                                .bodyBytes,
-                                          );
-                                          Navigator.pop(
-                                            context,
-                                          ); // close loading dialog
-                                          // Open chooser
-                                          final result =
-                                              await OpenFilex.open(
-                                                filePath,
-                                              );
-                                          if (result.type !=
-                                                  ResultType
-                                                      .done &&
-                                              context
-                                                  .mounted) {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  'Could not open file: ${result.message}',
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                        } catch (e) {
-                                          if (context
-                                              .mounted) {
-                                            Navigator.pop(
-                                              context,
-                                            ); // ensure dialog closed if error
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                  'Failed to open: $e',
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                        }
-                                      },
-                                    ),
-                                  ],
+                    child: GridView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount:
+                          controller.studyHubCards.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 0.8,
+                          ),
+                      itemBuilder: (context, index) {
+                        final file = controller
+                            .studyHubCards[index]; // FileCardModel
+                        return StudyCard(
+                          file: file,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => FeaturePage(
+                                  file: file,
+                                  isStudyHub: true,
                                 ),
                               ),
                             );
                           },
+
                           onLongPress: () {
                             confirmDeleteFile(
                               context,
@@ -269,9 +116,177 @@ class HomePage extends StatelessWidget {
                               file,
                             );
                           },
-                        ),
-                      );
+                        );
+                      },
+                    ),
+                  ),
+
+                  // Files tab (normal files)
+                  RefreshIndicator(
+                    onRefresh: () async {
+                      await controller
+                          .refreshFiles(); // create this async method
                     },
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount:
+                          controller.filesCards.length,
+                      itemBuilder: (context, index) {
+                        final file =
+                            controller.filesCards[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: 12,
+                          ),
+                          child: FileCardWidget(
+                            fileCard: file,
+                            onTap: () async {
+                              final url = file.fileUrl;
+                              final isTxt = url
+                                  .toLowerCase()
+                                  .endsWith('.txt');
+
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (_) => SafeArea(
+                                  child: Wrap(
+                                    children: [
+                                      if (isTxt)
+                                        ListTile(
+                                          leading: const Icon(
+                                            Icons
+                                                .description_outlined,
+                                          ),
+                                          title: const Text(
+                                            'View in app (TXT)',
+                                          ),
+                                          onTap: () {
+                                            Navigator.pop(
+                                              context,
+                                            );
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => FileViewerPage(
+                                                  fileUrl:
+                                                      url,
+                                                  fileName:
+                                                      file.fileName,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ListTile(
+                                        leading: const Icon(
+                                          Icons.open_in_new,
+                                        ),
+                                        title: const Text(
+                                          'Open with another app',
+                                        ),
+                                        onTap: () async {
+                                          Navigator.pop(
+                                            context,
+                                          );
+                                          try {
+                                            // Show a simple loading dialog while downloading
+                                            showDialog(
+                                              context:
+                                                  context,
+                                              barrierDismissible:
+                                                  false,
+                                              builder: (_) =>
+                                                  const Center(
+                                                    child:
+                                                        CircularProgressIndicator(),
+                                                  ),
+                                            );
+                                            // Download to temp
+                                            final response =
+                                                await http.get(
+                                                  Uri.parse(
+                                                    url,
+                                                  ),
+                                                );
+                                            final tempDir =
+                                                await getTemporaryDirectory();
+                                            final fileName =
+                                                url
+                                                    .split(
+                                                      '/',
+                                                    )
+                                                    .last
+                                                    .split(
+                                                      '?',
+                                                    )
+                                                    .first;
+                                            final filePath =
+                                                '${tempDir.path}/$fileName';
+                                            final f = File(
+                                              filePath,
+                                            );
+                                            await f.writeAsBytes(
+                                              response
+                                                  .bodyBytes,
+                                            );
+                                            Navigator.pop(
+                                              context,
+                                            ); // close loading dialog
+                                            // Open chooser
+                                            final result =
+                                                await OpenFilex.open(
+                                                  filePath,
+                                                );
+                                            if (result.type !=
+                                                    ResultType
+                                                        .done &&
+                                                context
+                                                    .mounted) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'Could not open file: ${result.message}',
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          } catch (e) {
+                                            if (context
+                                                .mounted) {
+                                              Navigator.pop(
+                                                context,
+                                              ); // ensure dialog closed if error
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'Failed to open: $e',
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            onLongPress: () {
+                              confirmDeleteFile(
+                                context,
+                                controller,
+                                file,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),

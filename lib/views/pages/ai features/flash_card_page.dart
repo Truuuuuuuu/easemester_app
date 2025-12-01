@@ -246,18 +246,7 @@ class _FlashcardsPageState extends State<FlashCardPage>
       ),
 
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Theme.of(
-                context,
-              ).colorScheme.primary.withOpacity(0.1),
-              Theme.of(context).colorScheme.surface,
-            ],
-          ),
-        ),
+        
         child: GestureDetector(
           onTap: _flipCard,
           onHorizontalDragEnd: (details) {

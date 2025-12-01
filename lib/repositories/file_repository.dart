@@ -106,7 +106,6 @@ class FileRepository {
     await docRef.update({'aiFeatures': summary});
   }
 
-  
   /// Delete file from both StudyHubFiles and Files tab
   Future<void> deleteFile(String uid, String fileId) async {
     final userRef = firestore.collection('users').doc(uid);
@@ -119,5 +118,38 @@ class FileRepository {
 
     await batch.commit();
     print("🗑️ Deleted file $fileId from both tabs");
+  }
+
+  // -----------------------------
+  // ✅ Add one-time fetch methods
+  // -----------------------------
+  Future<List<FileCardModel>> studyHubFilesOnce(
+    String uid,
+  ) async {
+    final snapshot = await firestore
+        .collection('users')
+        .doc(uid)
+        .collection('studyHubFiles')
+        .orderBy('timestamp', descending: true)
+        .get();
+
+    return snapshot.docs
+        .map((doc) => FileCardModel.fromDoc(doc))
+        .toList();
+  }
+
+  Future<List<FileCardModel>> filesTabFilesOnce(
+    String uid,
+  ) async {
+    final snapshot = await firestore
+        .collection('users')
+        .doc(uid)
+        .collection('files')
+        .orderBy('timestamp', descending: true)
+        .get();
+
+    return snapshot.docs
+        .map((doc) => FileCardModel.fromDoc(doc))
+        .toList();
   }
 }

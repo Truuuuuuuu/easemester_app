@@ -42,18 +42,6 @@ class _SummaryPageState extends State<SummaryPage> {
         ],
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Theme.of(
-                context,
-              ).colorScheme.primary.withOpacity(0.1),
-              Theme.of(context).colorScheme.surface,
-            ],
-          ),
-        ),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
