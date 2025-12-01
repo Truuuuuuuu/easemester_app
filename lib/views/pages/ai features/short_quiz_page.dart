@@ -24,6 +24,7 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
   final Map<int, TextEditingController> _textControllers =
       {};
   bool _loading = true;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -77,7 +78,7 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
           icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor:  Color.fromARGB(255, 9, 35, 64),
+        backgroundColor: Color.fromARGB(255, 9, 35, 64),
         foregroundColor: Colors.white,
         centerTitle: true,
         title: Column(
@@ -291,17 +292,22 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _controller.submitted
+              child: ElevatedButton(
+                onPressed:
+                    (_controller.submitted || _isSubmitting)
                     ? null
                     : () async {
+                        setState(() {
+                          _isSubmitting = true;
+                        });
+
                         _controller.markSubmitted();
                         _controller.calculateScore();
                         await _controller.saveAnswers(
                           widget.file.id,
                           isCompleted: true,
                         );
-                        // Update Completed Quiz achievement
+
                         await widget.achievementRepository
                             .incrementCompletedQuiz(
                               FirebaseAuth
@@ -310,15 +316,13 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
                                   .uid,
                             );
 
-                        setState(() {});
+                        setState(() {
+                          _isSubmitting = false;
+                        });
                       },
-                icon: const Icon(Icons.check),
-                label: const Text('Submit'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Colors.green, // Green background
-                  foregroundColor:
-                      Colors.white, // White text & icon
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     vertical: 16,
                   ),
@@ -326,6 +330,24 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                child: _isSubmitting
+                    ? const SizedBox(
+                        height: 22,
+                        width: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 3,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Row(
+                        mainAxisAlignment:
+                            MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.check),
+                          SizedBox(width: 8),
+                          Text('Submit'),
+                        ],
+                      ),
               ),
             ),
           ],
