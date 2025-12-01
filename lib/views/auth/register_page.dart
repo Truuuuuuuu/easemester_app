@@ -38,16 +38,22 @@ class _RegisterPageState extends State<RegisterPage> {
       );
       return;
     }
-    if (!RegExp(r'^[\w.+-]+@gmail\.com$').hasMatch(email)) {
+
+    // Updated: Accept any valid email
+    if (!RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    ).hasMatch(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Please enter a valid Gmail address',
+            'Please enter a valid email address',
           ),
         ),
       );
       return;
     }
+
+    // Password validation stays the same
     if (!RegExp(
       r'^(?=.*[A-Z])(?=.*\d).{6,}$',
     ).hasMatch(password)) {

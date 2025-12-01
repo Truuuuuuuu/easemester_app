@@ -43,6 +43,7 @@ class AboutUsPage extends StatelessWidget {
               'StudyHub is an AI-powered learning mobile application designed to help students understand, memorize, and review learning materials efficiently. '
               'Our platform allows students to upload documents, generate summaries, flashcards, and quizzes automatically, '
               'making studying smarter and more engaging.',
+              textAlign: TextAlign.justify,
               style: TextStyle(fontSize: 16, height: 1.5),
             ),
             const SizedBox(height: 20),
@@ -58,10 +59,25 @@ class AboutUsPage extends StatelessWidget {
             const SizedBox(height: 8),
             const Text(
               'To empower students with AI powered tools that simplify learning, improves memory, and promote self-paced study.',
+              textAlign: TextAlign.justify,
               style: TextStyle(fontSize: 16, height: 1.5),
             ),
             const SizedBox(height: 20),
-
+            // Vision Section
+            Text(
+              'Our Vision',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'To create a learning app where students can easily understand, retain, and gain knowledge through smart, automated study solutions.',
+              textAlign: TextAlign.justify,
+              style: TextStyle(fontSize: 16, height: 1.5),
+            ),
+            const SizedBox(height: 20),
             // Contact Info
             Text(
               'Contact Us',
@@ -95,7 +111,7 @@ class AboutUsPage extends StatelessWidget {
 
             /* TEAM MEMBERS */
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 50),
 
@@ -150,7 +166,7 @@ class AboutUsPage extends StatelessWidget {
                         CircleAvatar(
                           radius: 35,
                           backgroundImage: AssetImage(
-                            'assets/images/member2.jpg',
+                            'assets/images/estera.jpg',
                           ),
                         ),
                         SizedBox(height: 8),
@@ -213,7 +229,7 @@ class AboutUsPage extends StatelessWidget {
                         CircleAvatar(
                           radius: 35,
                           backgroundImage: AssetImage(
-                            'assets/images/member4.jpg',
+                            'assets/images/formento.jpg',
                           ),
                         ),
                         SizedBox(height: 8),
@@ -240,7 +256,7 @@ class AboutUsPage extends StatelessWidget {
                         CircleAvatar(
                           radius: 35,
                           backgroundImage: AssetImage(
-                            'assets/images/member5.jpg',
+                            'assets/images/gallego.jpg',
                           ),
                         ),
                         SizedBox(height: 8),

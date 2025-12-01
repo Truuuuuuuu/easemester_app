@@ -125,7 +125,6 @@ class _FlashcardsPageState extends State<FlashCardPage>
       child: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
-          // ✅ FIXED: Removed extra Transform to prevent mirrored text
           child: Text(
             isFront
                 ? (currentCard["definition"] ?? "")
@@ -163,12 +162,8 @@ class _FlashcardsPageState extends State<FlashCardPage>
           ),
           centerTitle: true,
           elevation: 0,
-          backgroundColor: Theme.of(
-            context,
-          ).colorScheme.primary,
-          foregroundColor: Theme.of(
-            context,
-          ).colorScheme.onPrimary,
+          backgroundColor:  Color.fromARGB(255, 9, 35, 64),
+          foregroundColor: Colors.white,
         ),
         body: const Center(
           child: Column(
@@ -203,12 +198,8 @@ class _FlashcardsPageState extends State<FlashCardPage>
           ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Theme.of(
-          context,
-        ).colorScheme.primary,
-        foregroundColor: Theme.of(
-          context,
-        ).colorScheme.onPrimary,
+        backgroundColor:  Color.fromARGB(255, 9, 35, 64),
+        foregroundColor: Colors.white,
         title: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -222,9 +213,7 @@ class _FlashcardsPageState extends State<FlashCardPage>
             Text(
               widget.file.fileName,
               style: AppFonts.paragraph.copyWith(
-                color: Theme.of(
-                  context,
-                ).colorScheme.onPrimary.withOpacity(0.9),
+                color: Colors.white70,
                 fontSize: 14,
               ),
               overflow: TextOverflow.ellipsis,

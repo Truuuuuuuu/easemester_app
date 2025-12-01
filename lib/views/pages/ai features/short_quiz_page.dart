@@ -77,12 +77,8 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
           icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: Theme.of(
-          context,
-        ).colorScheme.primary,
-        foregroundColor: Theme.of(
-          context,
-        ).colorScheme.onPrimary,
+        backgroundColor:  Color.fromARGB(255, 9, 35, 64),
+        foregroundColor: Colors.white,
         centerTitle: true,
         title: Column(
           children: [
@@ -101,18 +97,6 @@ class _ShortQuizPageState extends State<ShortQuizPage> {
       ),
       body: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Theme.of(
-                context,
-              ).colorScheme.primary.withOpacity(0.1),
-              Theme.of(context).colorScheme.surface,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
         child: Column(
           children: [
             if (_controller.isCompleted)

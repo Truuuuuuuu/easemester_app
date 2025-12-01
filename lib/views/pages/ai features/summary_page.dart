@@ -35,34 +35,10 @@ class _SummaryPageState extends State<SummaryPage> {
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Theme.of(
-          context,
-        ).colorScheme.primary,
-        foregroundColor: Theme.of(
-          context,
-        ).colorScheme.onPrimary,
+        backgroundColor:  Color.fromARGB(255, 9, 35, 64),
+        foregroundColor: Colors.white,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('How to Use'),
-                  content: const Text(
-                    'Tap "Summary" or "Original" to switch between the summarized version and the full text.',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () =>
-                          Navigator.of(context).pop(),
-                      child: const Text('Got it'),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+          
         ],
       ),
       body: Container(
@@ -115,19 +91,11 @@ class _SummaryPageState extends State<SummaryPage> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _showSummary
-                              ? Theme.of(
-                                  context,
-                                ).colorScheme.primary
-                              : Theme.of(
-                                  context,
-                                ).colorScheme.surface,
+                              ?  Color.fromARGB(255, 9, 35, 64)
+                              : Color.fromARGB(255, 230, 230, 230),
                           foregroundColor: _showSummary
-                              ? Theme.of(
-                                  context,
-                                ).colorScheme.onPrimary
-                              : Theme.of(
-                                  context,
-                                ).colorScheme.onSurface,
+                              ? Color.fromARGB(255, 230, 230, 230) 
+                              : Color.fromARGB(255, 9, 35, 64),
                           elevation: _showSummary ? 4 : 0,
                           shape: RoundedRectangleBorder(
                             borderRadius:
@@ -151,19 +119,11 @@ class _SummaryPageState extends State<SummaryPage> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: !_showSummary
-                              ? Theme.of(
-                                  context,
-                                ).colorScheme.primary
-                              : Theme.of(
-                                  context,
-                                ).colorScheme.surface,
+                              ? Color.fromARGB(255, 9, 35, 64)
+                              : Color.fromARGB(255, 230, 230, 230),
                           foregroundColor: !_showSummary
-                              ? Theme.of(
-                                  context,
-                                ).colorScheme.onPrimary
-                              : Theme.of(
-                                  context,
-                                ).colorScheme.onSurface,
+                              ? Color.fromARGB(255, 230, 230, 230) 
+                              : Color.fromARGB(255, 9, 35, 64),
                           elevation: !_showSummary ? 4 : 0,
                           shape: RoundedRectangleBorder(
                             borderRadius:
